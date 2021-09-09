@@ -6,10 +6,10 @@ import java.time.LocalDateTime;
 /**
  * IEntity.
  *
+ * @param <T> T
  * @author zhujunhan
  * @version 1.0
  * @date 2020/12/11
- * @param <T> T
  */
 public interface IEntity<T> extends Serializable {
 
@@ -24,11 +24,12 @@ public interface IEntity<T> extends Serializable {
      * setBh.
      *
      * @param bh bh
+     * @return T
      */
     T setBh(String bh);
 
     /**
-     * getCjsj/
+     * getCjsj.
      *
      * @return LocalDateTime
      */

@@ -12,6 +12,7 @@
         <module>tresdin-parent</module>
         <module>tresdin-interface</module>
         <module>tresdin-dictionary</module>
+        <module>tresdin-mybatis</module>
     </modules>
     <packaging>pom</packaging>
     <properties>
