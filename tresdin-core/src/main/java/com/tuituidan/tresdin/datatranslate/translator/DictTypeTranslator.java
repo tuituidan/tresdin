@@ -2,6 +2,15 @@ package com.tuituidan.tresdin.datatranslate.translator;
 
 import com.tuituidan.tresdin.datatranslate.annotation.DictType;
 import com.tuituidan.tresdin.datatranslate.bean.TranslationParameter;
+import com.tuituidan.tresdin.dictionary.IDictionaryService;
+import com.tuituidan.tresdin.dictionary.bean.IDictInfo;
+
+import java.util.Objects;
+import java.util.Optional;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * DictTypeTranslator.
@@ -10,7 +19,12 @@ import com.tuituidan.tresdin.datatranslate.bean.TranslationParameter;
  * @version 1.0
  * @date 2021/9/9
  */
+@Component
+@Slf4j
 public class DictTypeTranslator implements ITranslator<DictType> {
+
+    @Autowired(required = false)
+    private IDictionaryService dictionaryService;
 
     /**
      * 获取翻译内容.
@@ -20,6 +34,14 @@ public class DictTypeTranslator implements ITranslator<DictType> {
      */
     @Override
     public String translate(TranslationParameter translationParameter) {
-        return null;
+        if (dictionaryService == null) {
+            log.warn("无法翻译，注解CodeType依赖的INormalCodeService实例不存在！");
+            return "";
+        }
+        DictType dictType = (DictType) translationParameter.getAnnotation();
+        return Optional.ofNullable(translationParameter.getFieldValue())
+                .map(Objects::toString)
+                .map(code -> dictionaryService.getDictInfo(dictType.value(), code))
+                .map(IDictInfo::getName).orElse("");
     }
 }
