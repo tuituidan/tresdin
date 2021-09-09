@@ -20,9 +20,8 @@
             <artifactId>tresdin-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <artifactId>tresdin-interface</artifactId>
+            <groupId>com.tuituidan.tresdin</groupId>
         </dependency>
         <!-- mybatis -->
         <dependency>

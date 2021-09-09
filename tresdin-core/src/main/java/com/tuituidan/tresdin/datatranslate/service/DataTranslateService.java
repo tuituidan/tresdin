@@ -7,7 +7,7 @@ import com.tuituidan.tresdin.datatranslate.annotation.DeepTranslate;
 import com.tuituidan.tresdin.datatranslate.annotation.TranslateToString;
 import com.tuituidan.tresdin.datatranslate.bean.TranslationParameter;
 import com.tuituidan.tresdin.datatranslate.translator.ITranslator;
-import com.tuituidan.tresdin.mybatis.bean.PageData;
+import com.tuituidan.tresdin.page.PageData;
 import com.tuituidan.tresdin.util.FieldExtUtils;
 
 import java.lang.annotation.Annotation;

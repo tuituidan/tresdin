@@ -6,8 +6,8 @@ import static com.github.pagehelper.page.PageMethod.offsetPage;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.page.PageMethod;
 import com.tuituidan.tresdin.consts.Separator;
-import com.tuituidan.tresdin.mybatis.bean.PageData;
 import com.tuituidan.tresdin.mybatis.bean.PageParam;
+import com.tuituidan.tresdin.page.PageData;
 import com.tuituidan.tresdin.util.StringExtUtils;
 
 import java.lang.reflect.Field;
