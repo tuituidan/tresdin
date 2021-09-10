@@ -10,9 +10,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
-    <artifactId>tresdin-core</artifactId>
-    <name>tresdin-core</name>
-    <description>tresdin-core</description>
+    <artifactId>tresdin-core-starter</artifactId>
+    <name>tresdin-core-starter</name>
+    <description>tresdin-core-starter</description>
 
     <dependencies>
         <dependency>

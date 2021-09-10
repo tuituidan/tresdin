@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>com.tuituidan.tresdin</groupId>
-            <artifactId>tresdin-core</artifactId>
+            <artifactId>tresdin-core-starter</artifactId>
         </dependency>
     </dependencies>
     <build>

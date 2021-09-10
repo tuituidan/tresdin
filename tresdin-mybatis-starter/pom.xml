@@ -11,13 +11,13 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
 
-    <artifactId>tresdin-mybatis</artifactId>
+    <artifactId>tresdin-mybatis-starter</artifactId>
 
 
     <dependencies>
         <dependency>
             <groupId>com.tuituidan.tresdin</groupId>
-            <artifactId>tresdin-core</artifactId>
+            <artifactId>tresdin-core-starter</artifactId>
         </dependency>
         <dependency>
             <artifactId>tresdin-interface</artifactId>

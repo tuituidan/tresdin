@@ -56,7 +56,7 @@
             </dependency>
             <dependency>
                 <groupId>com.tuituidan.tresdin</groupId>
-                <artifactId>tresdin-core</artifactId>
+                <artifactId>tresdin-core-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
