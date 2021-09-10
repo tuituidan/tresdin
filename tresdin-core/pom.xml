@@ -37,6 +37,10 @@
             <artifactId>tresdin-interface</artifactId>
             <groupId>com.tuituidan.tresdin</groupId>
         </dependency>
+        <dependency>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot-starter</artifactId>
+        </dependency>
         <!-- tools -->
         <dependency>
             <groupId>org.apache.commons</groupId>
