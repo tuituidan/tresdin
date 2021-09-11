@@ -33,6 +33,9 @@ public class JsonTypeHandler extends BaseTypeHandler<Object> {
 
     protected Class<?> cls;
 
+    private static final String PG_OBJECT_CLASS = "org.postgresql.util.PGobject";
+    private static final String KB_OBJECT_CLASS = "com.kingbase8.util.KBobject";
+
     public JsonTypeHandler(Class<?> cls) {
         Assert.notNull(cls, "Type argument cannot be null");
         this.cls = cls;
@@ -40,14 +43,14 @@ public class JsonTypeHandler extends BaseTypeHandler<Object> {
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, Object parameter, JdbcType jdbcType) throws SQLException {
-        if (hasClass("org.postgresql.util.PGobject")) {
+        if (hasClass(PG_OBJECT_CLASS)) {
             PGobject jsonObject = new PGobject();
             jsonObject.setType("json");
             jsonObject.setValue(JSON.toJSONString(parameter));
             ps.setObject(i, jsonObject);
             return;
         }
-        if (hasClass("com.kingbase8.util.KBobject")) {
+        if (hasClass(KB_OBJECT_CLASS)) {
             KBobject jsonObject = new KBobject();
             jsonObject.setType("json");
             jsonObject.setValue(JSON.toJSONString(parameter));
@@ -74,7 +77,7 @@ public class JsonTypeHandler extends BaseTypeHandler<Object> {
     }
 
     protected Object toJavaObject(String columnValue) {
-        if (this.cls.getName().equals(JSONArray.class.getName())) {
+        if (this.cls.isAssignableFrom(JSONArray.class)) {
             return JSON.toJavaObject(JSON.parseArray(columnValue), this.cls);
         }
         return JSON.toJavaObject(JSON.parseObject(columnValue), this.cls);
@@ -82,8 +85,8 @@ public class JsonTypeHandler extends BaseTypeHandler<Object> {
 
     private boolean hasClass(String clsName) {
         try {
-            Class<?> clazz = ClassUtils.forName(clsName, JsonTypeHandler.class.getClassLoader());
-            return clazz != null;
+            ClassUtils.forName(clsName, JsonTypeHandler.class.getClassLoader());
+            return true;
         } catch (ClassNotFoundException | LinkageError e) {
             return false;
         }
