@@ -16,6 +16,17 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.kingbase8</groupId>
+            <artifactId>kingbase8</artifactId>
+            <version>8.6.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.tuituidan.tresdin</groupId>
             <artifactId>tresdin-core-starter</artifactId>
         </dependency>

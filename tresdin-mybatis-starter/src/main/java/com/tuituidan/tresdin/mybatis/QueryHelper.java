@@ -88,16 +88,16 @@ public class QueryHelper {
     public static <T> PageData<T> queryPage(PageParam pageParam, Supplier<T> supplier, Class<?> cls) {
         Page<T> page = offsetPage(pageParam.getOffset(), pageParam.getLimit());
         page.setOrderBy(formatSort(pageParam.getSort(), cls));
-        PageData<T> pageableData = new PageData<>();
+        PageData<T> pageData = new PageData<>();
         try {
-            pageableData.setData(supplier.get());
+            pageData.setData(supplier.get());
         } finally {
             clearPage();
         }
-        pageableData.setLimit(pageParam.getLimit());
-        pageableData.setOffset(pageParam.getOffset());
-        pageableData.setTotal(page.getTotal());
-        return pageableData;
+        pageData.setLimit(pageParam.getLimit());
+        pageData.setOffset(pageParam.getOffset());
+        pageData.setTotal(page.getTotal());
+        return pageData;
     }
 
     /**

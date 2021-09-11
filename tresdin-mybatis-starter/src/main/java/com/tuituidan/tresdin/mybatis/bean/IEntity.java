@@ -14,47 +14,47 @@ import java.time.LocalDateTime;
 public interface IEntity<T> extends Serializable {
 
     /**
-     * getBh.
+     * getId.
      *
      * @return String
      */
-    String getBh();
+    String getId();
 
     /**
-     * setBh.
+     * setId.
      *
-     * @param bh bh
+     * @param id id
      * @return T
      */
-    T setBh(String bh);
+    T setId(String id);
 
     /**
-     * getCjsj.
+     * getCreateTime.
      *
      * @return LocalDateTime
      */
-    LocalDateTime getCjsj();
+    LocalDateTime getCreateTime();
 
     /**
-     * setCjsj.
+     * setCreateTime.
      *
-     * @param cjsj cjsj
+     * @param createTime createTime
      * @return T
      */
-    T setCjsj(LocalDateTime cjsj);
+    T setCreateTime(LocalDateTime createTime);
 
     /**
-     * getZhgxsj.
+     * getUpdateTime.
      *
      * @return LocalDateTime
      */
-    LocalDateTime getZhgxsj();
+    LocalDateTime getUpdateTime();
 
     /**
-     * setZhgxsj.
+     * setUpdateTime.
      *
-     * @param zhgxsj zhgxsj
+     * @param updateTime updateTime
      * @return T
      */
-    T setZhgxsj(LocalDateTime zhgxsj);
+    T setUpdateTime(LocalDateTime updateTime);
 }

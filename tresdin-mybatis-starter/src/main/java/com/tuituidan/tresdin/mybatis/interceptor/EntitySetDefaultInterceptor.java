@@ -57,17 +57,16 @@ public class EntitySetDefaultInterceptor implements Interceptor {
         IEntity<?> entity = (IEntity<?>) obj;
         switch (commandType) {
             case INSERT:
-                if (StringUtils.isBlank(entity.getBh())) {
-                    // 为空才赋值，这样支持预设值
-                    entity.setBh(StringExtUtils.getUuid());
+                if (StringUtils.isBlank(entity.getId())) {
+                    entity.setId(StringExtUtils.getUuid());
                 }
-                if (entity.getCjsj() == null) {
-                    entity.setCjsj(LocalDateTime.now());
+                if (entity.getCreateTime() == null) {
+                    entity.setCreateTime(LocalDateTime.now());
                 }
-                entity.setZhgxsj(LocalDateTime.now());
+                entity.setUpdateTime(LocalDateTime.now());
                 break;
             case UPDATE:
-                entity.setZhgxsj(LocalDateTime.now());
+                entity.setUpdateTime(LocalDateTime.now());
                 break;
             default:
                 break;
