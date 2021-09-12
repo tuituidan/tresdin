@@ -76,7 +76,7 @@ public class JsonTypeHandler extends BaseTypeHandler<Object> {
         return toJavaObject(cs.getString(columnIndex));
     }
 
-    protected Object toJavaObject(String columnValue) {
+    private Object toJavaObject(String columnValue) {
         if (this.cls.isAssignableFrom(JSONArray.class)) {
             return JSON.toJavaObject(JSON.parseArray(columnValue), this.cls);
         }

@@ -24,11 +24,11 @@ public interface IDictType {
     String getName();
 
     /**
-     * getSystem.
+     * getSystemTag.
      *
      * @return String
      */
-    String getSystem();
+    String getSystemTag();
 
     /**
      * getValid.
@@ -54,12 +54,12 @@ public interface IDictType {
     IDictType setName(String name);
 
     /**
-     * setSystem.
+     * setSystemTag.
      *
-     * @param system system
+     * @param systemTag systemTag
      * @return IDictType
      */
-    IDictType setSystem(String system);
+    IDictType setSystemTag(String systemTag);
 
     /**
      * setValid.
