@@ -1,19 +1,9 @@
 package com.tuituidan.tresdin.util.thread;
 
-/**
- * AsyncUtils.
- *
- * @author tuituidan
- * @version 1.0
- * @date 2021/9/8
- */
-
 import com.tuituidan.tresdin.util.thread.config.ThreadPoolConfig;
 import com.tuituidan.tresdin.util.thread.config.ThreadPoolConfigItem;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;

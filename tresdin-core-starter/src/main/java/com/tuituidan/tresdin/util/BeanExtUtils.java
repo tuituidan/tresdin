@@ -1,13 +1,11 @@
 package com.tuituidan.tresdin.util;
 
 import com.tuituidan.tresdin.exception.NewInstanceException;
-
 import java.beans.FeatureDescriptor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
 import lombok.experimental.UtilityClass;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;

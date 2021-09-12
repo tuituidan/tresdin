@@ -1,8 +1,7 @@
 package com.tuituidan.tresdin.exception;
 
-import com.tuituidan.tresdin.util.StringExtUtils;
-
 import ch.qos.logback.classic.spi.EventArgUtil;
+import com.tuituidan.tresdin.util.StringExtUtils;
 
 /**
  * NewInstanceException.

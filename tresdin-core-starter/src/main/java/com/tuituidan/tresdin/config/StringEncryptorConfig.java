@@ -2,7 +2,6 @@ package com.tuituidan.tresdin.config;
 
 import com.ulisesbocchio.jasyptspringboot.EncryptablePropertyDetector;
 import com.ulisesbocchio.jasyptspringboot.detector.DefaultPropertyDetector;
-
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
@@ -30,7 +29,6 @@ public class StringEncryptorConfig {
     @Bean("jasyptStringEncryptor")
     @ConditionalOnMissingBean
     public StringEncryptor stringEncryptor() {
-        PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
         config.setPassword("pp57@dxd");
         config.setAlgorithm("PBEWITHHMACSHA512ANDAES_256");
@@ -39,6 +37,7 @@ public class StringEncryptorConfig {
         config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator");
         config.setIvGeneratorClassName("org.jasypt.iv.RandomIvGenerator");
         config.setStringOutputType("base64");
+        PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
         encryptor.setConfig(config);
         return encryptor;
     }
@@ -53,4 +52,5 @@ public class StringEncryptorConfig {
     public EncryptablePropertyDetector encryptablePropertyDetector() {
         return new DefaultPropertyDetector("ENC#", "");
     }
+
 }

@@ -1,7 +1,6 @@
 package com.tuituidan.tresdin.datatranslate.bean;
 
 import java.lang.annotation.Annotation;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

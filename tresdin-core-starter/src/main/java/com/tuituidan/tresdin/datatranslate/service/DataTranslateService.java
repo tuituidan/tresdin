@@ -9,7 +9,6 @@ import com.tuituidan.tresdin.datatranslate.bean.TranslationParameter;
 import com.tuituidan.tresdin.datatranslate.translator.ITranslator;
 import com.tuituidan.tresdin.page.PageData;
 import com.tuituidan.tresdin.util.FieldExtUtils;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -27,11 +26,9 @@ import java.util.Objects;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.annotation.PostConstruct;
-
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,24 +42,29 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class DataTranslateService {
-    public static final String TranslatePropSuffix = "TranslateText";
+
+    public static final String DESC_SUFFIX = "Desc";
 
     /**
-     * 存储翻译器bean实例
+     * 存储翻译器bean实例.
      */
     @Autowired(required = false)
     private List<ITranslator<?>> registeredTranslators;
 
     /**
-     * key为该翻译器对应注解类型，value为翻译器实例
+     * key为该翻译器对应注解类型，value为翻译器实例.
      */
-    private Map<Class<?>, ITranslator<?>> translatorMap = new HashMap<>(16);
+    private Map<Class<?>, ITranslator<?>> translatorMap;
 
     @PostConstruct
     private void init() {
-        if (CollectionUtils.isNotEmpty(registeredTranslators)) {
-            registeredTranslators.forEach(e -> translatorMap.put(((Class<?>) (((ParameterizedType) e.getClass()
-                    .getGenericInterfaces()[0]).getActualTypeArguments()[0])), e));
+        if (CollectionUtils.isEmpty(registeredTranslators)) {
+            return;
+        }
+        translatorMap = new HashMap<>(registeredTranslators.size());
+        for (ITranslator<?> translator : registeredTranslators) {
+            translatorMap.put(((Class<?>) (((ParameterizedType) translator.getClass()
+                    .getGenericInterfaces()[0]).getActualTypeArguments()[0])), translator);
         }
     }
 
@@ -162,9 +164,10 @@ public class DataTranslateService {
             Collector collector = Objects.nonNull(translateToStringAnnotation)
                     ? Collectors.joining(translateToStringAnnotation.separator()) : Collectors.toList();
             ITranslator<?> translator = translatorMap.get(translatorAnnotation.annotationType());
-            Object resultList = compatibleStream(value).map(e -> translator.translate(new TranslationParameter(translatorAnnotation, e, valueWrapper.getObj())))
-                    .collect(collector);
-            result.put(fieldName + TranslatePropSuffix, resultList);
+            Object resultList =
+                    compatibleStream(value).map(e -> translator.translate(new TranslationParameter(translatorAnnotation, e, valueWrapper.getObj())))
+                            .collect(collector);
+            result.put(fieldName + DESC_SUFFIX, resultList);
         } else {
             if (deep && !(value instanceof JSONArray)) {
                 // 根据集合中的第一个数据来判断集合中存储的数据类型
@@ -205,8 +208,9 @@ public class DataTranslateService {
         Annotation translatorAnnotation = getTranslatorAnnotation(field);
         if (translatorAnnotation != null) {
             ITranslator<?> translator = translatorMap.get(translatorAnnotation.annotationType());
-            String translateText = translator.translate(new TranslationParameter(translatorAnnotation, value, valueWrapper.getObj()));
-            result.put(fieldName + TranslatePropSuffix, translateText);
+            String translateText = translator.translate(new TranslationParameter(translatorAnnotation, value,
+                    valueWrapper.getObj()));
+            result.put(fieldName + DESC_SUFFIX, translateText);
         } else {
             if (deep && isParseableObject(value)) {
                 Object subResult = JSON.toJSON(value);
@@ -269,16 +273,23 @@ public class DataTranslateService {
         return null;
     }
 
-
     enum ParseType {
+        /**
+         * ParseType.
+         */
         OBJECT, OBJECT_FIELD, COLLECTION_FIELD
     }
 
     static class ValueWrapper {
+
         Field field;
+
         Object value;
+
         JSONObject result;
+
         ParseType parseType;
+
         Object obj;
 
         ValueWrapper(Field field, Object value, JSONObject result, ParseType parseType, Object obj) {
@@ -324,5 +335,7 @@ public class DataTranslateService {
         public void setObj(Object obj) {
             this.obj = obj;
         }
+
     }
+
 }

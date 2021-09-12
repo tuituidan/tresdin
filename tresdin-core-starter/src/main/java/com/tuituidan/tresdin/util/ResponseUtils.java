@@ -1,7 +1,6 @@
 package com.tuituidan.tresdin.util;
 
 import com.tuituidan.tresdin.exception.DownloadFailException;
-
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,9 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
 import javax.servlet.http.HttpServletResponse;
-
 import lombok.experimental.UtilityClass;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpHeaders;

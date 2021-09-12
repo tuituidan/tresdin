@@ -2,7 +2,6 @@ package com.tuituidan.tresdin.mybatis.config;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;

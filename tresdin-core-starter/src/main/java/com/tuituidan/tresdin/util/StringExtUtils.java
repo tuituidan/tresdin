@@ -5,7 +5,6 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-
 import lombok.experimental.UtilityClass;
 import org.slf4j.helpers.MessageFormatter;
 

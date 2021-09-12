@@ -2,11 +2,9 @@ package com.tuituidan.tresdin.mybatis.interceptor;
 
 import com.tuituidan.tresdin.mybatis.bean.IEntity;
 import com.tuituidan.tresdin.util.StringExtUtils;
-
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Properties;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.binding.MapperMethod.ParamMap;
 import org.apache.ibatis.executor.Executor;

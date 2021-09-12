@@ -4,10 +4,8 @@ import com.tuituidan.tresdin.datatranslate.annotation.DictType;
 import com.tuituidan.tresdin.datatranslate.bean.TranslationParameter;
 import com.tuituidan.tresdin.dictionary.IDictionaryService;
 import com.tuituidan.tresdin.dictionary.bean.IDictInfo;
-
 import java.util.Objects;
 import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -2,9 +2,7 @@ package com.tuituidan.tresdin.datatranslate.aop;
 
 import com.tuituidan.tresdin.datatranslate.annotation.DataTranslate;
 import com.tuituidan.tresdin.datatranslate.service.DataTranslateService;
-
 import javax.annotation.Resource;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
