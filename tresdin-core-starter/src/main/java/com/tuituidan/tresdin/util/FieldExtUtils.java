@@ -20,6 +20,14 @@ import org.springframework.util.ReflectionUtils;
  */
 @UtilityClass
 public class FieldExtUtils {
+
+    /**
+     * getFieldValue
+     *
+     * @param field field
+     * @param model model
+     * @return Object
+     */
     public static Object getFieldValue(Field field, Object model) {
         try {
             ReflectionUtils.makeAccessible(field);
@@ -29,6 +37,12 @@ public class FieldExtUtils {
         }
     }
 
+    /**
+     * getFields
+     *
+     * @param cls cls
+     * @return Field[]
+     */
     public static Field[] getFields(Class<?> cls) {
         List<Field> allFields = new ArrayList<>();
         for (Class<?> currentClass = cls; currentClass != null; currentClass = currentClass.getSuperclass()) {
@@ -49,4 +63,5 @@ public class FieldExtUtils {
             }).toArray(Field[]::new);
         });
     }
+
 }

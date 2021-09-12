@@ -68,6 +68,12 @@ public class DataTranslateService {
         }
     }
 
+    /**
+     * handleValue
+     *
+     * @param obj obj
+     * @return Object
+     */
     public Object handleValue(Object obj) {
         // 如果是分页对象,则只把其中的数据对象翻译
         if (obj instanceof PageData) {
@@ -89,14 +95,32 @@ public class DataTranslateService {
         return handleOne(obj);
     }
 
+    /**
+     * handleCollection
+     *
+     * @param collection collection
+     * @return Collection
+     */
     public Collection<Object> handleCollection(Collection<?> collection) {
         return collection.stream().map(this::handleOne).collect(Collectors.toList());
     }
 
+    /**
+     * handleArray
+     *
+     * @param collection collection
+     * @return Collection
+     */
     public Collection<Object> handleArray(Object[] collection) {
         return Arrays.stream(collection).map(this::handleOne).collect(Collectors.toList());
     }
 
+    /**
+     * handleOne
+     *
+     * @param obj obj
+     * @return Object
+     */
     public Object handleOne(final Object obj) {
         if (!isParseableObject(obj)) {
             return obj;
@@ -165,7 +189,9 @@ public class DataTranslateService {
                     ? Collectors.joining(translateToStringAnnotation.separator()) : Collectors.toList();
             ITranslator<?> translator = translatorMap.get(translatorAnnotation.annotationType());
             Object resultList =
-                    compatibleStream(value).map(e -> translator.translate(new TranslationParameter(translatorAnnotation, e, valueWrapper.getObj())))
+                    compatibleStream(value)
+                            .map(e -> translator.translate(
+                                    new TranslationParameter(translatorAnnotation, e, valueWrapper.getObj())))
                             .collect(collector);
             result.put(fieldName + DESC_SUFFIX, resultList);
         } else {
@@ -240,6 +266,12 @@ public class DataTranslateService {
                 && !(obj instanceof PageData);
     }
 
+    /**
+     * isPrimitiveObject
+     *
+     * @param clazz clazz
+     * @return boolean
+     */
     public boolean isPrimitiveObject(Class<?> clazz) {
         return clazz.isPrimitive()
                 || clazz == Boolean.class

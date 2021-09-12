@@ -38,7 +38,8 @@ public class ArrayTypeHandler extends BaseTypeHandler<Object[]> {
     }
 
     @Override
-    public void setNonNullParameter(PreparedStatement ps, int i, Object[] parameter, JdbcType jdbcType) throws SQLException {
+    public void setNonNullParameter(PreparedStatement ps, int i, Object[] parameter, JdbcType jdbcType)
+            throws SQLException {
         String typeName = TYPE_MAP.get(parameter.getClass());
         Assert.hasText(typeName, "不支持的数组类型-" + parameter.getClass().getName());
         Connection conn = ps.getConnection();
@@ -49,7 +50,7 @@ public class ArrayTypeHandler extends BaseTypeHandler<Object[]> {
     /**
      * Gets the nullable result.
      *
-     * @param rs         the rs
+     * @param rs the rs
      * @param columnName Colunm name, when configuration <code>useColumnLabel</code> is <code>false</code>
      * @return the nullable result
      * @throws SQLException the SQL exception
@@ -77,6 +78,7 @@ public class ArrayTypeHandler extends BaseTypeHandler<Object[]> {
                 log.error("获取数组出错！", e);
             }
         }
-        return new Object[]{};
+        return new Object[] {};
     }
+
 }

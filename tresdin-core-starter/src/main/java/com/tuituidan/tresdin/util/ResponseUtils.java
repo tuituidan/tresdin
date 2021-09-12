@@ -30,12 +30,12 @@ public class ResponseUtils {
     /**
      * 文件下载.
      *
-     * @param fileName    fileName
+     * @param fileName fileName
      * @param inputStream inputStream
      */
     public static void download(String fileName, InputStream inputStream) {
         try (InputStream in = inputStream;
-             OutputStream outputStream = getHttpResponse(fileName).getOutputStream()) {
+                OutputStream outputStream = getHttpResponse(fileName).getOutputStream()) {
             IOUtils.copy(in, outputStream);
         } catch (Exception ex) {
             throw new DownloadFailException("下载失败", ex);
@@ -46,12 +46,12 @@ public class ResponseUtils {
      * 批量下载.
      *
      * @param fileName fileName
-     * @param files    files
+     * @param files files
      */
     public static void batchDownload(String fileName, Map<String, InputStream> files) {
         try (OutputStream outputStream = getHttpResponse(fileName).getOutputStream();
-             ZipOutputStream zipOut = new ZipOutputStream(outputStream);
-             DataOutputStream data = new DataOutputStream(zipOut)) {
+                ZipOutputStream zipOut = new ZipOutputStream(outputStream);
+                DataOutputStream data = new DataOutputStream(zipOut)) {
             for (Map.Entry<String, InputStream> entry : files.entrySet()) {
                 zipOut.putNextEntry(new ZipEntry(entry.getKey()));
                 try (InputStream in = entry.getValue()) {
@@ -64,7 +64,6 @@ public class ResponseUtils {
             throw new DownloadFailException("批量下载失败", ex);
         }
     }
-
 
     /**
      * 获取下载头信息.
@@ -92,4 +91,5 @@ public class ResponseUtils {
         ServletRequestAttributes attrs = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
         return attrs == null ? null : attrs.getResponse();
     }
+
 }

@@ -19,5 +19,12 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target({FIELD, METHOD})
 public @interface DictType {
+
+    /**
+     * value
+     *
+     * @return String
+     */
     String value();
+
 }

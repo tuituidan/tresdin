@@ -32,15 +32,22 @@ public class JsonTypeHandler extends BaseTypeHandler<Object> {
     protected Class<?> cls;
 
     private static final String PG_OBJECT_CLASS = "org.postgresql.util.PGobject";
+
     private static final String KB_OBJECT_CLASS = "com.kingbase8.util.KBobject";
 
+    /**
+     * JsonTypeHandler
+     *
+     * @param cls cls
+     */
     public JsonTypeHandler(Class<?> cls) {
         Assert.notNull(cls, "Type argument cannot be null");
         this.cls = cls;
     }
 
     @Override
-    public void setNonNullParameter(PreparedStatement ps, int i, Object parameter, JdbcType jdbcType) throws SQLException {
+    public void setNonNullParameter(PreparedStatement ps, int i, Object parameter, JdbcType jdbcType)
+            throws SQLException {
         if (hasClass(PG_OBJECT_CLASS)) {
             PGobject jsonObject = new PGobject();
             jsonObject.setType("json");
@@ -89,4 +96,5 @@ public class JsonTypeHandler extends BaseTypeHandler<Object> {
             return false;
         }
     }
+
 }

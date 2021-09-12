@@ -47,7 +47,6 @@ public class CompletableUtils  {
         return createThreadPoolExecutor(targetConfig, new ArrayBlockingQueue<>(targetConfig.getQueueSize()));
     }
 
-
     static ThreadPoolExecutor createThreadPoolExecutor(ThreadPoolConfigItem config, BlockingQueue<Runnable> queue) {
         ThreadPoolConfigItem targetConfig = BeanExtUtils.convert(DEF_CONFIG, ThreadPoolConfigItem.class);
         if (config != null) {
