@@ -119,10 +119,11 @@ public class QueryHelper {
             return sort;
         }
         return Arrays.stream(sort.split(Separator.COMMA)).map(fieldName -> {
-            String direction = " asc";
+            // asc默认就是nulls last
+            String direction = " ASC";
             if (fieldName.startsWith(Separator.HYPHEN)) {
                 fieldName = StringUtils.substringAfter(fieldName, Separator.HYPHEN);
-                direction = " desc nulls last";
+                direction = " DESC NULLS LAST";
             }
             Column column = getDataBaseColumn(fieldName, cls);
             if (column == null) {
