@@ -35,7 +35,7 @@ public class QueryHelper {
      * 查询数量.
      *
      * @param supplier supplier
-     * @param <T>      T
+     * @param <T> T
      * @return long
      */
     public static <T> long count(Supplier<T> supplier) {
@@ -55,7 +55,7 @@ public class QueryHelper {
      * 设置排序.
      *
      * @param sort sort
-     * @param cls  cls
+     * @param cls cls
      */
     public static void orderBy(String sort, Class<?> cls) {
         PageMethod.orderBy(formatSort(sort, cls));
@@ -65,8 +65,8 @@ public class QueryHelper {
      * 分页查询，不转换排序字段.
      *
      * @param pageParam 分页参数
-     * @param supplier  执行方法
-     * @param <T>       T
+     * @param supplier 执行方法
+     * @param <T> T
      * @return PageData PageData
      */
     public static <T> PageData<T> queryPage(PageParam pageParam, Supplier<T> supplier) {
@@ -77,9 +77,9 @@ public class QueryHelper {
      * 分页查询，转换排序字段.
      *
      * @param pageParam 分页参数
-     * @param supplier  执行方法
-     * @param cls       cls
-     * @param <T>       T
+     * @param supplier 执行方法
+     * @param cls cls
+     * @param <T> T
      * @return PageData PageData
      */
     public static <T> PageData<T> queryPage(PageParam pageParam, Supplier<T> supplier, Class<?> cls) {
@@ -111,7 +111,7 @@ public class QueryHelper {
      * 转换restful格式的排序字段.
      *
      * @param sort sort
-     * @param cls  cls
+     * @param cls cls
      * @return string
      */
     public static String formatSort(String sort, Class<?> cls) {
@@ -119,25 +119,34 @@ public class QueryHelper {
             return sort;
         }
         return Arrays.stream(sort.split(Separator.COMMA)).map(fieldName -> {
-            String direction = " asc nulls last";
+            String direction = " asc";
             if (fieldName.startsWith(Separator.HYPHEN)) {
                 fieldName = StringUtils.substringAfter(fieldName, Separator.HYPHEN);
                 direction = " desc nulls last";
             }
-            if (cls == null) {
-                return fieldName + direction;
-            }
-            Field field = FieldUtils.getField(cls, fieldName, true);
-            if (field == null) {
-                return fieldName + direction;
-            }
-            Column column = AnnotationUtils.findAnnotation(field, Column.class);
+            Column column = getDataBaseColumn(fieldName, cls);
             if (column == null) {
-                Assert.notNull(AnnotationUtils.findAnnotation(field, Transient.class),
-                        StringExtUtils.format("无法找到排序字段{}对应的数据库字段", fieldName));
                 return fieldName + direction;
             }
             return column.name() + direction;
         }).collect(Collectors.joining(Separator.COMMA));
     }
+
+    private static Column getDataBaseColumn(String fieldName, Class<?> cls) {
+        if (cls == null) {
+            return null;
+        }
+        Field field = FieldUtils.getField(cls, fieldName, true);
+        if (field == null) {
+            return null;
+        }
+        Column column = AnnotationUtils.findAnnotation(field, Column.class);
+        if (column == null) {
+            Assert.notNull(AnnotationUtils.findAnnotation(field, Transient.class),
+                    StringExtUtils.format("无法找到排序字段{}对应的数据库字段", fieldName));
+            return null;
+        }
+        return column;
+    }
+
 }
