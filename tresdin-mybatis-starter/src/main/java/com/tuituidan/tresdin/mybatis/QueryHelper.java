@@ -120,12 +120,12 @@ public class QueryHelper {
         }
         return Arrays.stream(sort.split(Separator.COMMA)).map(fieldName -> {
             // asc默认就是nulls last
-            String direction = " ASC";
+            String direction = " asc";
             if (fieldName.startsWith(Separator.HYPHEN)) {
                 fieldName = StringUtils.substringAfter(fieldName, Separator.HYPHEN);
-                direction = " DESC NULLS LAST";
+                direction = " desc nulls last";
             }
-            Column column = getDataBaseColumn(fieldName, cls);
+            Column column = getColumn(fieldName, cls);
             if (column == null) {
                 return fieldName + direction;
             }
@@ -133,7 +133,7 @@ public class QueryHelper {
         }).collect(Collectors.joining(Separator.COMMA));
     }
 
-    private static Column getDataBaseColumn(String fieldName, Class<?> cls) {
+    private static Column getColumn(String fieldName, Class<?> cls) {
         if (cls == null) {
             return null;
         }
