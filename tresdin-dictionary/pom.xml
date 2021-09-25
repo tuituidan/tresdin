@@ -15,6 +15,10 @@
     <description>tresdin-dictionary</description>
     <dependencies>
         <dependency>
+            <artifactId>tresdin-interface</artifactId>
+            <groupId>com.tuituidan.tresdin</groupId>
+        </dependency>
+        <dependency>
             <groupId>com.tuituidan.tresdin</groupId>
             <artifactId>tresdin-core-starter</artifactId>
         </dependency>
@@ -33,6 +37,15 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>

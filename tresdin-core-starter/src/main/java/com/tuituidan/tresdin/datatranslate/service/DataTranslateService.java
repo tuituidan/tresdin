@@ -43,7 +43,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class DataTranslateService {
 
-    public static final String DESC_SUFFIX = "Desc";
+    public static final String TRANSLATE_TEXT = "TranslateText";
 
     /**
      * 存储翻译器bean实例.
@@ -193,7 +193,7 @@ public class DataTranslateService {
                             .map(e -> translator.translate(
                                     new TranslationParameter(translatorAnnotation, e, valueWrapper.getObj())))
                             .collect(collector);
-            result.put(fieldName + DESC_SUFFIX, resultList);
+            result.put(fieldName + TRANSLATE_TEXT, resultList);
         } else {
             if (deep && !(value instanceof JSONArray)) {
                 // 根据集合中的第一个数据来判断集合中存储的数据类型
@@ -236,7 +236,7 @@ public class DataTranslateService {
             ITranslator<?> translator = translatorMap.get(translatorAnnotation.annotationType());
             String translateText = translator.translate(new TranslationParameter(translatorAnnotation, value,
                     valueWrapper.getObj()));
-            result.put(fieldName + DESC_SUFFIX, translateText);
+            result.put(fieldName + TRANSLATE_TEXT, translateText);
         } else {
             if (deep && isParseableObject(value)) {
                 Object subResult = JSON.toJSON(value);

@@ -119,8 +119,8 @@ public class QueryHelper {
             return sort;
         }
         return Arrays.stream(sort.split(Separator.COMMA)).map(fieldName -> {
-            // asc默认就是nulls last
-            String direction = " asc";
+            // pg排序默认就是（升序） asc nulls last
+            String direction = "";
             if (fieldName.startsWith(Separator.HYPHEN)) {
                 fieldName = StringUtils.substringAfter(fieldName, Separator.HYPHEN);
                 direction = " desc nulls last";

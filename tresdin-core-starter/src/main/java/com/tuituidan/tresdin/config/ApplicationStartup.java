@@ -2,11 +2,11 @@ package com.tuituidan.tresdin.config;
 
 import com.tuituidan.tresdin.util.NetworkUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.stereotype.Component;
-
 
 /**
  * ApplicationStartup.
@@ -19,11 +19,19 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ApplicationStartup implements ApplicationListener<ApplicationReadyEvent> {
 
+    /**
+     * 通过配置控制是否开启.
+     */
+    @Value("${swagger.show:true}")
+    private boolean swaggerShow;
+
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         ConfigurableEnvironment environment = event.getApplicationContext().getEnvironment();
         String port = environment.getProperty("local.server.port");
         String contextPath = environment.getProperty("server.servlet.context-path", "");
-        log.info("http://{}:{}{}", NetworkUtils.getLocalIp(), port, contextPath);
+        String swagger = swaggerShow ? "/swagger-ui/index.html" : "";
+        log.info("http://{}:{}{}{}", NetworkUtils.getLocalIp(), port, contextPath, swagger);
     }
+
 }
