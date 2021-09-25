@@ -15,6 +15,11 @@
     <description>tresdin-dictionary</description>
     <dependencies>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <artifactId>tresdin-interface</artifactId>
             <groupId>com.tuituidan.tresdin</groupId>
         </dependency>
