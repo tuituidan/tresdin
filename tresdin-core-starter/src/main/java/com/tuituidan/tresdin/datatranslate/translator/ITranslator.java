@@ -13,6 +13,16 @@ import com.tuituidan.tresdin.datatranslate.bean.TranslationParameter;
 public interface ITranslator<T> {
 
     /**
+     * 得到要显示的字段名
+     *
+     * @param fieldName 原字段名
+     * @return String
+     */
+    default String getFieldName(String fieldName) {
+        return fieldName + "TranslateText";
+    }
+
+    /**
      * 获取翻译内容.
      *
      * @param translationParameter 翻译用到的参数.
