@@ -33,7 +33,7 @@ public class DictTypeTranslator implements ITranslator<DictType> {
     @Override
     public String translate(TranslationParameter translationParameter) {
         if (dictionaryService == null) {
-            log.warn("无法翻译，注解CodeType依赖的INormalCodeService实例不存在！");
+            log.warn("无法翻译，注解DictType依赖的IDictionaryService实例不存在！");
             return "";
         }
         DictType dictType = (DictType) translationParameter.getAnnotation();
