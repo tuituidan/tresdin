@@ -10,9 +10,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
-    <artifactId>tresdin-dictionary</artifactId>
-    <name>tresdin-dictionary</name>
-    <description>tresdin-dictionary</description>
+    <artifactId>tresdin-dictionary-starter</artifactId>
+    <name>tresdin-dictionary-starter</name>
+    <description>tresdin-dictionary-starter</description>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

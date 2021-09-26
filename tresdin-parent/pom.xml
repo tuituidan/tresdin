@@ -75,7 +75,7 @@
             </dependency>
             <dependency>
                 <groupId>com.tuituidan.tresdin</groupId>
-                <artifactId>tresdin-dictionary</artifactId>
+                <artifactId>tresdin-dictionary-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

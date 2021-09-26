@@ -11,7 +11,7 @@
         <module>tresdin-core-starter</module>
         <module>tresdin-parent</module>
         <module>tresdin-interface</module>
-        <module>tresdin-dictionary</module>
+        <module>tresdin-dictionary-starter</module>
         <module>tresdin-mybatis-starter</module>
     </modules>
     <packaging>pom</packaging>
