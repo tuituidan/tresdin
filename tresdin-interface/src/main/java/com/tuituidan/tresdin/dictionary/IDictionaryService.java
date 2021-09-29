@@ -1,7 +1,7 @@
 package com.tuituidan.tresdin.dictionary;
 
-import com.tuituidan.tresdin.dictionary.bean.IDictInfo;
-import com.tuituidan.tresdin.dictionary.bean.IDictType;
+import com.tuituidan.tresdin.dictionary.bean.DictInfo;
+import com.tuituidan.tresdin.dictionary.bean.DictType;
 import java.util.List;
 
 /**
@@ -19,7 +19,7 @@ public interface IDictionaryService {
      * @param type type
      * @return List
      */
-    List<IDictInfo> getDictInfoList(String type);
+    List<DictInfo> getDictInfoList(String type);
 
     /**
      * getDictType
@@ -27,7 +27,7 @@ public interface IDictionaryService {
      * @param type type
      * @return IDictType
      */
-    IDictType getDictType(String type);
+    DictType getDictType(String type);
 
     /**
      * getDictInfo.
@@ -36,7 +36,7 @@ public interface IDictionaryService {
      * @param code code
      * @return IDictInfo
      */
-    IDictInfo getDictInfo(String type, String code);
+    DictInfo getDictInfo(String type, String code);
 
     /**
      * reloadCache

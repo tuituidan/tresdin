@@ -21,18 +21,28 @@ public class DictionaryConfig {
     /**
      * 获取字典数据的类型
      */
-    private DictTypeEnum type;
+    private DictTypeEnum type = DictTypeEnum.XLSX;
 
     /**
      * 配置为REMOTE则通过这个地址获取
      */
     private String url;
 
+    /**
+     * 查询数据字典类型的sql
+     */
+    private String dictTypeSql;
+
+    /**
+     * 查询数据字典的sql
+     */
+    private String dictInfoSql;
+
     enum DictTypeEnum {
         /**
-         * XLSX，REMOTE
+         * XLSX, DATABASE, REMOTE
          */
-        XLSX, REMOTE;
+        XLSX, DATABASE, REMOTE;
     }
 
 }

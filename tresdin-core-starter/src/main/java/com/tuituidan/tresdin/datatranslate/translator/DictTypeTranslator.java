@@ -3,7 +3,7 @@ package com.tuituidan.tresdin.datatranslate.translator;
 import com.tuituidan.tresdin.datatranslate.annotation.DictType;
 import com.tuituidan.tresdin.datatranslate.bean.TranslationParameter;
 import com.tuituidan.tresdin.dictionary.IDictionaryService;
-import com.tuituidan.tresdin.dictionary.bean.IDictInfo;
+import com.tuituidan.tresdin.dictionary.bean.DictInfo;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +40,6 @@ public class DictTypeTranslator implements ITranslator<DictType> {
         return Optional.ofNullable(translationParameter.getFieldValue())
                 .map(Objects::toString)
                 .map(code -> dictionaryService.getDictInfo(dictType.value(), code))
-                .map(IDictInfo::getName).orElse("");
+                .map(DictInfo::getName).orElse("");
     }
 }

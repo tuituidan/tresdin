@@ -1,10 +1,10 @@
 package com.tuituidan.tresdin.dict.service;
 
 import com.alibaba.excel.EasyExcelFactory;
-import com.tuituidan.tresdin.dict.bean.DictInfo;
-import com.tuituidan.tresdin.dict.bean.DictType;
+import com.tuituidan.tresdin.consts.Separator;
 import com.tuituidan.tresdin.dict.bean.XlsxDict;
-import com.tuituidan.tresdin.dictionary.bean.IDictInfo;
+import com.tuituidan.tresdin.dictionary.bean.DictInfo;
+import com.tuituidan.tresdin.dictionary.bean.DictType;
 import com.tuituidan.tresdin.util.BeanExtUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
@@ -42,25 +41,24 @@ public class XlsxDictionaryService extends AbstractDictionaryService {
         try {
             InputStream commonStream = this.getClass().getClassLoader()
                     .getResourceAsStream(DICT_COMMON_PATH);
-            transResource("common", commonStream);
+            transResource(commonStream);
             Resource[] resources = ResourcePatternUtils
                     .getResourcePatternResolver(new PathMatchingResourcePatternResolver())
                     .getResources(DICT_SOURCE_PATH);
             for (Resource resource : resources) {
-                transResource(FilenameUtils.getBaseName(resource.getFilename()), resource.getInputStream());
+                transResource(resource.getInputStream());
             }
         } catch (IOException e) {
             throw new ResourceAccessException("数据字典文件加载失败，请检查classpath:dict-source下是否有数据字典配置文件", e);
         }
     }
 
-    private void transResource(String systemTag, InputStream inputStream) {
+    private void transResource(InputStream inputStream) {
         List<XlsxDict> datas = EasyExcelFactory.read(inputStream)
                 .autoCloseStream(true).head(XlsxDict.class).doReadAllSync()
                 .stream().map(XlsxDict.class::cast).collect(Collectors.toList());
-        log.info("加载【{}】的数据字典", systemTag);
         String pid = "";
-        List<IDictInfo> dictList = new ArrayList<>();
+        List<DictInfo> dictList = new ArrayList<>();
         for (XlsxDict data : datas) {
             if (StringUtils.isBlank(data.getPid())) {
                 // 保存上一个
@@ -68,13 +66,13 @@ public class XlsxDictionaryService extends AbstractDictionaryService {
                     dictListCache.put(pid, new ArrayList<>(dictList));
                     dictList.clear();
                 }
-                dictTypeCache.put(data.getId(), BeanExtUtils.convert(data, DictType.class).setSystemTag(systemTag));
+                dictTypeCache.put(data.getId(), BeanExtUtils.convert(data, DictType.class));
                 pid = data.getId();
                 continue;
             }
             DictInfo dict = BeanExtUtils.convert(data, DictInfo.class);
             dictList.add(dict);
-            dictInfoCache.put(pid + "-" + data.getId(), dict);
+            dictInfoCache.put(pid + Separator.HYPHEN + data.getId(), dict);
         }
     }
 

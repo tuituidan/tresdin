@@ -2,8 +2,8 @@ package com.tuituidan.tresdin.dict.config;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.tuituidan.tresdin.dictionary.bean.IDictInfo;
-import com.tuituidan.tresdin.dictionary.bean.IDictType;
+import com.tuituidan.tresdin.dictionary.bean.DictInfo;
+import com.tuituidan.tresdin.dictionary.bean.DictType;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +24,7 @@ public class DictionaryCacheConfig {
      * @return Cache
      */
     @Bean
-    public Cache<String, IDictType> dictTypeCache() {
+    public Cache<String, DictType> dictTypeCache() {
         return Caffeine.newBuilder().build();
     }
 
@@ -34,7 +34,7 @@ public class DictionaryCacheConfig {
      * @return Cache
      */
     @Bean
-    public Cache<String, List<IDictInfo>> dictListCache() {
+    public Cache<String, List<DictInfo>> dictListCache() {
         return Caffeine.newBuilder().build();
     }
 
@@ -44,7 +44,7 @@ public class DictionaryCacheConfig {
      * @return Cache
      */
     @Bean
-    public Cache<String, IDictInfo> dictInfoCache() {
+    public Cache<String, DictInfo> dictInfoCache() {
         return Caffeine.newBuilder().build();
     }
 

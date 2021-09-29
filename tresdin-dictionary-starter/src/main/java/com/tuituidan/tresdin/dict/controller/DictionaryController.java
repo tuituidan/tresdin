@@ -1,8 +1,8 @@
 package com.tuituidan.tresdin.dict.controller;
 
 import com.tuituidan.tresdin.dictionary.IDictionaryService;
-import com.tuituidan.tresdin.dictionary.bean.IDictInfo;
-import com.tuituidan.tresdin.dictionary.bean.IDictType;
+import com.tuituidan.tresdin.dictionary.bean.DictInfo;
+import com.tuituidan.tresdin.dictionary.bean.DictType;
 import java.util.List;
 import javax.annotation.Resource;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +32,7 @@ public class DictionaryController {
      * @return List
      */
     @GetMapping("/type/{type}/dict")
-    public ResponseEntity<List<IDictInfo>> getDictInfoList(@PathVariable("type") String type) {
+    public ResponseEntity<List<DictInfo>> getDictInfoList(@PathVariable("type") String type) {
         return ResponseEntity.ok(dictionaryService.getDictInfoList(type));
     }
 
@@ -44,7 +44,7 @@ public class DictionaryController {
      * @return IDictInfo
      */
     @GetMapping("/type/{type}/dict/{code}")
-    public ResponseEntity<IDictInfo> getDictInfo(@PathVariable("type") String type, @PathVariable("code") String code) {
+    public ResponseEntity<DictInfo> getDictInfo(@PathVariable("type") String type, @PathVariable("code") String code) {
         return ResponseEntity.ok(dictionaryService.getDictInfo(type, code));
     }
 
@@ -55,7 +55,7 @@ public class DictionaryController {
      * @return IDictType
      */
     @GetMapping("/type/{type}")
-    public ResponseEntity<IDictType> getDictInfo(@PathVariable("type") String type) {
+    public ResponseEntity<DictType> getDictInfo(@PathVariable("type") String type) {
         return ResponseEntity.ok(dictionaryService.getDictType(type));
     }
 

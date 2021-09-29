@@ -1,9 +1,10 @@
 package com.tuituidan.tresdin.dict.service;
 
 import com.github.benmanes.caffeine.cache.Cache;
+import com.tuituidan.tresdin.consts.Separator;
 import com.tuituidan.tresdin.dictionary.IDictionaryService;
-import com.tuituidan.tresdin.dictionary.bean.IDictInfo;
-import com.tuituidan.tresdin.dictionary.bean.IDictType;
+import com.tuituidan.tresdin.dictionary.bean.DictInfo;
+import com.tuituidan.tresdin.dictionary.bean.DictType;
 import java.util.List;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 
 /**
- * AbstractDictionaryService.
+ * 数据字段服务抽象类.
  *
  * @author tuituidan
  * @version 1.0
@@ -21,13 +22,13 @@ import org.springframework.boot.ApplicationRunner;
 public abstract class AbstractDictionaryService implements IDictionaryService, ApplicationRunner {
 
     @Resource
-    protected Cache<String, IDictType> dictTypeCache;
+    protected Cache<String, DictType> dictTypeCache;
 
     @Resource
-    protected Cache<String, IDictInfo> dictInfoCache;
+    protected Cache<String, DictInfo> dictInfoCache;
 
     @Resource
-    protected Cache<String, List<IDictInfo>> dictListCache;
+    protected Cache<String, List<DictInfo>> dictListCache;
 
     /**
      * getDictInfoList
@@ -36,7 +37,7 @@ public abstract class AbstractDictionaryService implements IDictionaryService, A
      * @return List
      */
     @Override
-    public List<IDictInfo> getDictInfoList(String type) {
+    public List<DictInfo> getDictInfoList(String type) {
         return dictListCache.getIfPresent(type);
     }
 
@@ -47,7 +48,7 @@ public abstract class AbstractDictionaryService implements IDictionaryService, A
      * @return IDictType
      */
     @Override
-    public IDictType getDictType(String type) {
+    public DictType getDictType(String type) {
         return dictTypeCache.getIfPresent(type);
     }
 
@@ -59,8 +60,8 @@ public abstract class AbstractDictionaryService implements IDictionaryService, A
      * @return IDictInfo
      */
     @Override
-    public IDictInfo getDictInfo(String type, String code) {
-        return dictInfoCache.getIfPresent(type + "-" + code);
+    public DictInfo getDictInfo(String type, String code) {
+        return dictInfoCache.getIfPresent(type + Separator.HYPHEN + code);
     }
 
     /**
