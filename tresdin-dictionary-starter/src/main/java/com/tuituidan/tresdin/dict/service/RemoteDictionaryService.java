@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -34,6 +35,7 @@ public class RemoteDictionaryService extends AbstractDictionaryService {
      */
     @Override
     public List<DictInfo> loadDictList() {
+        Assert.hasText(dictionaryConfig.getUrl(), "请配置数据字典远端地址");
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(dictionaryConfig.getUrl(), String.class);
         return JSON.parseArray(responseEntity.getBody(), DictInfo.class);
     }
