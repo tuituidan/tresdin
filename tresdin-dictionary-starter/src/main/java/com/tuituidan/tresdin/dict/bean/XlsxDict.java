@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * DictJson.
+ * XlsxDict.
  *
  * @author tuituidan
  * @version 1.0

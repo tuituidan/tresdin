@@ -1,16 +1,11 @@
 package com.tuituidan.tresdin.dict.service;
 
 import com.alibaba.fastjson.JSON;
-import com.tuituidan.tresdin.consts.Separator;
-import com.tuituidan.tresdin.dict.bean.DictTree;
 import com.tuituidan.tresdin.dict.config.DictionaryConfig;
 import com.tuituidan.tresdin.dictionary.bean.DictInfo;
-import com.tuituidan.tresdin.dictionary.bean.DictType;
-import com.tuituidan.tresdin.util.BeanExtUtils;
 import java.util.List;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -38,20 +33,9 @@ public class RemoteDictionaryService extends AbstractDictionaryService {
      * loadCache
      */
     @Override
-    public void loadCache() {
+    public List<DictInfo> loadDictList() {
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(dictionaryConfig.getUrl(), String.class);
-        List<DictTree> trees = JSON.parseArray(responseEntity.getBody(), DictTree.class);
-        if (CollectionUtils.isEmpty(trees)) {
-            log.error("未能获取数据字典");
-            return;
-        }
-        for (DictTree type : trees) {
-            dictTypeCache.put(type.getId(), BeanExtUtils.convert(type, DictType.class));
-            dictListCache.put(type.getId(), type.getChildren());
-            for (DictInfo dictInfo : type.getChildren()) {
-                dictInfoCache.put(type.getId() + Separator.HYPHEN + dictInfo.getId(), dictInfo);
-            }
-        }
+        return JSON.parseArray(responseEntity.getBody(), DictInfo.class);
     }
 
 }

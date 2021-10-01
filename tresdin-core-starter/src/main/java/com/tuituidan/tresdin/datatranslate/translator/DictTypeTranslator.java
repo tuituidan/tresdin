@@ -39,7 +39,7 @@ public class DictTypeTranslator implements ITranslator<DictType> {
         DictType dictType = (DictType) translationParameter.getAnnotation();
         return Optional.ofNullable(translationParameter.getFieldValue())
                 .map(Objects::toString)
-                .map(code -> dictionaryService.getDictInfo(dictType.value(), code))
+                .map(code -> dictionaryService.getDict(dictType.value(), code))
                 .map(DictInfo::getName).orElse("");
     }
 }

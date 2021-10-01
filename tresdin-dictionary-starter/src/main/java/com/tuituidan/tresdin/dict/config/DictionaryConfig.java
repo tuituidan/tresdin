@@ -29,14 +29,10 @@ public class DictionaryConfig {
     private String url;
 
     /**
-     * 查询数据字典类型的sql
-     */
-    private String dictTypeSql;
-
-    /**
      * 查询数据字典的sql
      */
-    private String dictInfoSql;
+    private String sql = "SELECT c_id as id , c_pid as pid, c_name as name, c_level as level, n_order as order, "
+            + "c_valid as valid FROM db_dict.t_dict_info";
 
     enum DictTypeEnum {
         /**
