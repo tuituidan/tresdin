@@ -32,6 +32,23 @@ import org.springframework.util.Assert;
 public class QueryHelper {
 
     /**
+     * 计算页数.
+     *
+     * @param total 数据总条数
+     * @param pageSize 每页条数
+     * @return 总页数
+     */
+    public static int calcPageCount(long total, int pageSize) {
+        if (total == 0) {
+            return 0;
+        }
+        if (total <= pageSize) {
+            return 1;
+        }
+        return (int) (total + pageSize - 1) / pageSize;
+    }
+
+    /**
      * 查询数量.
      *
      * @param supplier supplier

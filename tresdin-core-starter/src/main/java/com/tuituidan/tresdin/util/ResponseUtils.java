@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -13,7 +14,6 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.util.Assert;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -73,7 +73,6 @@ public class ResponseUtils {
      */
     public static HttpServletResponse getHttpResponse(String fileName) {
         HttpServletResponse response = getHttpResponse();
-        Assert.notNull(response, "请在web上下文中使用");
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         fileName = fileName.replaceAll("\\s*", "");
@@ -89,7 +88,9 @@ public class ResponseUtils {
      */
     public static HttpServletResponse getHttpResponse() {
         ServletRequestAttributes attrs = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
-        return attrs == null ? null : attrs.getResponse();
+        return Optional.ofNullable(attrs)
+                .map(ServletRequestAttributes::getResponse)
+                .orElseThrow(() -> new UnsupportedOperationException("请在web上下文中获取HttpServletResponse"));
     }
 
 }
