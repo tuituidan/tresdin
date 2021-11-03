@@ -11,6 +11,8 @@ import com.tuituidan.tresdin.page.PageData;
 import com.tuituidan.tresdin.util.StringExtUtils;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.persistence.Column;
@@ -112,6 +114,25 @@ public class QueryHelper {
         pageData.setOffset(pageParam.getOffset());
         pageData.setTotal(page.getTotal());
         return pageData;
+    }
+
+    /**
+     * 转换分页结果集
+     *
+     * @param pageData 原结果集
+     * @param transFunc 数据转换方法
+     * @param <T> T
+     * @param <R> R
+     * @return ArteryPageableData
+     */
+    public static <T, R> PageData<List<R>> mapArteryPage(PageData<List<T>> pageData,
+            Function<T, R> transFunc) {
+        PageData<List<R>> result = new PageData<>();
+        result.setData(pageData.getData().stream().map(transFunc).collect(Collectors.toList()));
+        result.setLimit(pageData.getLimit());
+        result.setOffset(pageData.getOffset());
+        result.setTotal(pageData.getTotal());
+        return result;
     }
 
     /**

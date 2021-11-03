@@ -3,6 +3,7 @@ package com.tuituidan.tresdin.util;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -35,12 +36,12 @@ public class RequestUtils {
      */
     public static String getClientIp() {
         String ip = getClientIpFromRequest(getRequest());
-        if (isIpUnknown(ip)) {
+        if (!isValidIp(ip)) {
             return "";
         }
         String[] ips = ip.split(",");
         for (String i : ips) {
-            if (!isIpUnknown(i)) {
+            if (isValidIp(i)) {
                 ip = i;
                 break;
             }
@@ -51,15 +52,15 @@ public class RequestUtils {
     private static String getClientIpFromRequest(HttpServletRequest request) {
         for (String header : HEADERS_IP_RELATED) {
             String ip = request.getHeader(header);
-            if (!isIpUnknown(ip)) {
+            if (isValidIp(ip)) {
                 return ip;
             }
         }
         return request.getRemoteAddr();
     }
 
-    private static boolean isIpUnknown(String ip) {
-        return ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip);
+    private static boolean isValidIp(String ip) {
+        return StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip);
     }
 
     /**
