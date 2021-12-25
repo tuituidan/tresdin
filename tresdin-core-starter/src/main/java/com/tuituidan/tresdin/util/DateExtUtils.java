@@ -13,7 +13,7 @@ import org.springframework.util.Assert;
  * @date 2021/9/12
  */
 @UtilityClass
-public class DateUtils {
+public class DateExtUtils {
 
     /**
      * 根据出生日期计算年龄.

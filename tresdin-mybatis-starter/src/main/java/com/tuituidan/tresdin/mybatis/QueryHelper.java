@@ -123,9 +123,9 @@ public class QueryHelper {
      * @param transFunc 数据转换方法
      * @param <T> T
      * @param <R> R
-     * @return ArteryPageableData
+     * @return PageData
      */
-    public static <T, R> PageData<List<R>> mapArteryPage(PageData<List<T>> pageData,
+    public static <T, R> PageData<List<R>> mapPage(PageData<List<T>> pageData,
             Function<T, R> transFunc) {
         PageData<List<R>> result = new PageData<>();
         result.setData(pageData.getData().stream().map(transFunc).collect(Collectors.toList()));

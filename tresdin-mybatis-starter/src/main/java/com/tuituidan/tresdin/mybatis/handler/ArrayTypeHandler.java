@@ -78,7 +78,7 @@ public class ArrayTypeHandler extends BaseTypeHandler<Object[]> {
                 log.error("获取数组出错！", e);
             }
         }
-        return new Object[] {};
+        return null;
     }
 
 }

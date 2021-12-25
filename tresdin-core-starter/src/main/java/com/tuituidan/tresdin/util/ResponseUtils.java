@@ -1,7 +1,6 @@
 package com.tuituidan.tresdin.util;
 
 import com.tuituidan.tresdin.exception.DownloadFailException;
-import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -49,15 +48,11 @@ public class ResponseUtils {
      * @param files files
      */
     public static void batchDownload(String fileName, Map<String, InputStream> files) {
-        try (OutputStream outputStream = getHttpResponse(fileName).getOutputStream();
-                ZipOutputStream zipOut = new ZipOutputStream(outputStream);
-                DataOutputStream data = new DataOutputStream(zipOut)) {
+        try (ZipOutputStream zipOut = new ZipOutputStream(getHttpResponse(fileName).getOutputStream())) {
             for (Map.Entry<String, InputStream> entry : files.entrySet()) {
                 zipOut.putNextEntry(new ZipEntry(entry.getKey()));
                 try (InputStream in = entry.getValue()) {
-                    IOUtils.copy(in, data);
-                } finally {
-                    zipOut.closeEntry();
+                    IOUtils.copy(in, zipOut);
                 }
             }
         } catch (Exception ex) {

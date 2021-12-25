@@ -2,10 +2,11 @@ package com.tuituidan.tresdin.util;
 
 import com.tuituidan.tresdin.exception.NewInstanceException;
 import java.beans.FeatureDescriptor;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -24,12 +25,13 @@ import org.springframework.util.Assert;
  */
 @UtilityClass
 public class BeanExtUtils {
+
     /**
      * 转换对象.
      *
      * @param source 源属性Dto
-     * @param cls    目标属性Do
-     * @param <T>    转换类型
+     * @param cls 目标属性Do
+     * @param <T> 转换类型
      * @return T
      */
     public static <T> T convert(Object source, Class<T> cls) {
@@ -39,10 +41,10 @@ public class BeanExtUtils {
     /**
      * 转换对象.
      *
-     * @param source           源属性Dto
-     * @param cls              目标属性Do
+     * @param source 源属性Dto
+     * @param cls 目标属性Do
      * @param ignoreProperties 要忽略的属性
-     * @param <T>              转换类型
+     * @param <T> 转换类型
      * @return T
      */
     public static <T> T convert(Object source, Class<T> cls, String... ignoreProperties) {
@@ -59,14 +61,15 @@ public class BeanExtUtils {
      *
      * @param source source
      * @param target target
-     * @param props  props
+     * @param props props
      */
     public static void copyProperties(Object source, Object target, String... props) {
-        Assert.notEmpty(props, "props不能为空，必须指定要拷贝的属性");
+        Assert.notEmpty(props, "必须指定要拷贝的属性，否则请直接使用Spring的BeanUtils.copyProperties");
         BeanUtils.copyProperties(source, target,
-                Arrays.stream(new BeanWrapperImpl(source).getPropertyDescriptors()).filter(pd -> !ArrayUtils
-                        .contains(props, pd.getName()))
-                        .map(FeatureDescriptor::getName).toArray(String[]::new));
+                Arrays.stream(new BeanWrapperImpl(source).getPropertyDescriptors())
+                        .map(FeatureDescriptor::getName)
+                        .filter(name -> !ArrayUtils.contains(props, name))
+                        .toArray(String[]::new));
     }
 
     /**
@@ -74,7 +77,7 @@ public class BeanExtUtils {
      *
      * @param source source
      * @param target target
-     * @param keys   keys
+     * @param keys keys
      * @return boolean
      */
     public static boolean equals(Object source, Object target, String... keys) {
@@ -99,26 +102,24 @@ public class BeanExtUtils {
      */
     public static void copyNotNullProperties(Object source, Object target) {
         final BeanWrapper src = new BeanWrapperImpl(source);
-        BeanUtils.copyProperties(source, target, Arrays.stream(src.getPropertyDescriptors())
-                .map(FeatureDescriptor::getName)
-                .filter(name -> src.getPropertyValue(name) == null).toArray(String[]::new));
+        BeanUtils.copyProperties(source, target, Arrays.stream(src.getPropertyDescriptors()).filter(item ->
+                Objects.isNull(item.getReadMethod()) || Objects.isNull(src.getPropertyValue(item.getName()))
+        ).map(FeatureDescriptor::getName).toArray(String[]::new));
     }
 
     /**
      * List拷贝.
      *
-     * @param source 源数组
+     * @param sourceList 源集合
      * @param target 目标对象
-     * @param <T>    目标对象类型
+     * @param <T> 目标对象类型
      * @return list
      */
-    public static <T> List<T> copyList(List<?> source, Class<T> target) {
-        List<T> targetList = new ArrayList<>();
-        if (CollectionUtils.isEmpty(source)) {
-            return targetList;
+    public static <T> List<T> convertList(List<?> sourceList, Class<T> target) {
+        if (CollectionUtils.isEmpty(sourceList)) {
+            return Collections.emptyList();
         }
-        source.forEach(item -> targetList.add(convert(item, target)));
-        return targetList;
+        return sourceList.stream().map(item -> convert(item, target)).collect(Collectors.toList());
 
     }
 
@@ -129,4 +130,5 @@ public class BeanExtUtils {
             throw new NewInstanceException("转换错误-{}", cls.getName(), ex);
         }
     }
+
 }
