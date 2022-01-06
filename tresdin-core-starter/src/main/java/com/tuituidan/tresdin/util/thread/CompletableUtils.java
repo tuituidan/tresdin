@@ -42,7 +42,7 @@ public class CompletableUtils implements ApplicationContextAware {
         DEF_CONFIG.setMaxPoolNum(maximumPoolSize);
         DEF_CONFIG.setKeepAliveTime(KEEP_ALIVE_TIME);
         DEF_CONFIG.setQueueSize(QUEUE_SIZE);
-        DEF_CONFIG.setThreadNamePrefix("sacwfx-thread");
+        DEF_CONFIG.setThreadNamePrefix("tresdin-thread");
     }
 
     /**
@@ -67,17 +67,18 @@ public class CompletableUtils implements ApplicationContextAware {
      * runAsync.
      *
      * @param task task
-     * @return Void Void
+     * @return Void
      */
     public static CompletableFuture<Void> runAsync(Runnable task) {
         return CompletableFuture.runAsync(task, threadPool);
     }
 
     /**
-     * runAsync.
+     * runAsync
      *
      * @param task task
-     * @return Void Void
+     * @param <T> T
+     * @return CompletableFuture
      */
     public static <T> CompletableFuture<T> runAsync(Supplier<T> task) {
         return CompletableFuture.supplyAsync(task, threadPool);
