@@ -47,7 +47,7 @@ public class XlsxDictionaryService extends AbstractDictionaryService {
             for (Resource resource : resources) {
                 result.addAll(readXlsxToDictList(resource.getInputStream()));
             }
-            return BeanExtUtils.copyList(result, DictInfo.class);
+            return BeanExtUtils.convertList(result, DictInfo::new);
         } catch (IOException e) {
             throw new ResourceAccessException("数据字典文件加载失败，请检查classpath:dict-source下是否有数据字典配置文件", e);
         }

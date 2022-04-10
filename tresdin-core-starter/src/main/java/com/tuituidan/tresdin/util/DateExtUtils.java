@@ -1,6 +1,8 @@
 package com.tuituidan.tresdin.util;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
@@ -53,10 +55,32 @@ public class DateExtUtils {
     public static LocalDate parseLocalDate(String source) {
         Assert.hasText(source, "请传入要转换日期的字符串");
         String time = source.trim().replaceAll("\\D", "-");
-        String[] split = time.split("-");
-        split[1] = StringUtils.leftPad(split[1], 2, "0");
-        split[2] = StringUtils.leftPad(split[2], 2, "0");
-        return LocalDate.parse(StringUtils.join(split, "-"));
+        String[] split = Arrays.stream(time.split("-"))
+                .filter(StringUtils::isNoneBlank).toArray(String[]::new);
+        Assert.isTrue(split.length > 2, "日期格式错误：" + source);
+        return LocalDate.of(Integer.parseInt(split[0]),
+                Integer.parseInt(split[1]),
+                Integer.parseInt(split[2]));
+    }
+
+    /**
+     * parseLocalDateTime
+     *
+     * @param source source
+     * @return LocalDateTime
+     */
+    public static LocalDateTime parseLocalDateTime(String source) {
+        Assert.hasText(source, "请传入要转换时间的字符串");
+        String time = source.trim().replaceAll("\\D", "-");
+        String[] split = Arrays.stream(time.split("-"))
+                .filter(StringUtils::isNoneBlank).toArray(String[]::new);
+        Assert.isTrue(split.length > 5, "时间格式错误：" + source);
+        return LocalDateTime.of(Integer.parseInt(split[0]),
+                Integer.parseInt(split[1]),
+                Integer.parseInt(split[2]),
+                Integer.parseInt(split[3]),
+                Integer.parseInt(split[4]),
+                Integer.parseInt(split[5]));
     }
 
 }

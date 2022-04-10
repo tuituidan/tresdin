@@ -65,6 +65,8 @@ public abstract class AbstractDictionaryService implements IDictionaryService, A
 
     /**
      * loadDictList
+     *
+     * @return List
      */
     public abstract List<DictInfo> loadDictList();
 

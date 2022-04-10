@@ -1,11 +1,11 @@
 package com.tuituidan.tresdin.util;
 
-import com.tuituidan.tresdin.exception.NewInstanceException;
 import java.beans.FeatureDescriptor;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.collections4.CollectionUtils;
@@ -27,32 +27,32 @@ import org.springframework.util.Assert;
 public class BeanExtUtils {
 
     /**
-     * 转换对象.
+     * 转换对象，Target target = BeanExtUtils.convert(source, Target::new).
      *
      * @param source 源属性Dto
-     * @param cls 目标属性Do
+     * @param supplier 创建目标对象
      * @param <T> 转换类型
      * @return T
      */
-    public static <T> T convert(Object source, Class<T> cls) {
-        return convert(source, cls, (String) null);
+    public static <T> T convert(Object source, Supplier<T> supplier) {
+        return convert(source, supplier, (String) null);
     }
 
     /**
-     * 转换对象.
+     * 转换对象,Target target = BeanExtUtils.convert(source, Target::new, "id", "name").
      *
      * @param source 源属性Dto
-     * @param cls 目标属性Do
+     * @param supplier 创建目标对象
      * @param ignoreProperties 要忽略的属性
      * @param <T> 转换类型
      * @return T
      */
-    public static <T> T convert(Object source, Class<T> cls, String... ignoreProperties) {
+    public static <T> T convert(Object source, Supplier<T> supplier, String... ignoreProperties) {
         if (source == null) {
             return null;
         }
-        T target = newInstanceByCls(cls);
-        BeanUtils.copyProperties(source, target, ignoreProperties);
+        T target = supplier.get();
+        BeanUtils.copyProperties(source, supplier.get(), ignoreProperties);
         return target;
     }
 
@@ -108,27 +108,19 @@ public class BeanExtUtils {
     }
 
     /**
-     * List拷贝.
+     * List拷贝, List targets = BeanExtUtils.convert(sourceList, Target::new).
      *
      * @param sourceList 源集合
-     * @param target 目标对象
+     * @param supplier 目标对象
      * @param <T> 目标对象类型
      * @return list
      */
-    public static <T> List<T> convertList(List<?> sourceList, Class<T> target) {
+    public static <T> List<T> convertList(List<?> sourceList, Supplier<T> supplier) {
         if (CollectionUtils.isEmpty(sourceList)) {
             return Collections.emptyList();
         }
-        return sourceList.stream().map(item -> convert(item, target)).collect(Collectors.toList());
+        return sourceList.stream().map(item -> convert(item, supplier)).collect(Collectors.toList());
 
-    }
-
-    private static <T> T newInstanceByCls(Class<T> cls) {
-        try {
-            return cls.getDeclaredConstructor().newInstance();
-        } catch (Exception ex) {
-            throw new NewInstanceException("转换错误-{}", cls.getName(), ex);
-        }
     }
 
 }

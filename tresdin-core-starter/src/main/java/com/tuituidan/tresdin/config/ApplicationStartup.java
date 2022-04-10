@@ -28,10 +28,8 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         ConfigurableEnvironment environment = event.getApplicationContext().getEnvironment();
-        String port = environment.getProperty("local.server.port");
-        String contextPath = environment.getProperty("server.servlet.context-path", "");
         String swagger = swaggerShow ? "/swagger-ui/index.html" : "";
-        log.info("http://{}:{}{}{}", NetworkUtils.getLocalIp(), port, contextPath, swagger);
+        log.info(NetworkUtils.getLocalUrl(environment) + swagger);
     }
 
 }
