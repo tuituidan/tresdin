@@ -52,7 +52,7 @@ public class BeanExtUtils {
             return null;
         }
         T target = supplier.get();
-        BeanUtils.copyProperties(source, supplier.get(), ignoreProperties);
+        BeanUtils.copyProperties(source, target, ignoreProperties);
         return target;
     }
 

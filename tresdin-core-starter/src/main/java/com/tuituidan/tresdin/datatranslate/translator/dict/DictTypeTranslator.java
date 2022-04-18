@@ -1,7 +1,7 @@
-package com.tuituidan.tresdin.datatranslate.translator;
+package com.tuituidan.tresdin.datatranslate.translator.dict;
 
-import com.tuituidan.tresdin.datatranslate.annotation.DictType;
 import com.tuituidan.tresdin.datatranslate.bean.TranslationParameter;
+import com.tuituidan.tresdin.datatranslate.translator.ITranslator;
 import com.tuituidan.tresdin.dictionary.IDictionaryService;
 import com.tuituidan.tresdin.dictionary.bean.DictInfo;
 import java.util.Objects;

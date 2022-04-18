@@ -1,4 +1,4 @@
-package com.tuituidan.tresdin.datatranslate.annotation;
+package com.tuituidan.tresdin.datatranslate.translator.dict;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
