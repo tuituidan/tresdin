@@ -71,7 +71,7 @@ public abstract class AbstractDictionaryService implements IDictionaryService, A
     public abstract List<DictInfo> loadDictList();
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         log.info("开始加载数据字典.");
         long start = System.currentTimeMillis();
         loadCache();

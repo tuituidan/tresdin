@@ -31,8 +31,7 @@ public class DictionaryConfig {
     /**
      * 查询数据字典的sql
      */
-    private String sql = "SELECT c_id as id , c_pid as pid, c_name as name, c_level as level, n_order as order, "
-            + "c_valid as valid FROM db_dict.t_dict_info";
+    private String sql = "SELECT id, pid, name, level, order, valid FROM db_dict.dict_info";
 
     enum DictTypeEnum {
         /**

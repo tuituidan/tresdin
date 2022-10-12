@@ -20,28 +20,28 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring-boot.version>2.5.4</spring-boot.version>
+        <spring-boot.version>2.7.4</spring-boot.version>
 
-        <caffeine.version>2.8.6</caffeine.version>
-        <commons-beanutils.version>1.9.3</commons-beanutils.version>
-        <commons-collections4.version>4.2</commons-collections4.version>
-        <commons-io.version>2.6</commons-io.version>
-        <commons-lang3.version>3.9</commons-lang3.version>
-        <easyexcel.version>2.2.10</easyexcel.version>
-        <fastjson.version>1.2.74</fastjson.version>
+        <caffeine.version>2.9.3</caffeine.version>
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
+        <commons-collections4.version>4.4</commons-collections4.version>
+        <commons-io.version>2.11.0</commons-io.version>
+        <commons-lang3.version>3.12.0</commons-lang3.version>
+        <easyexcel.version>3.1.1</easyexcel.version>
+        <fastjson.version>2.0.14</fastjson.version>
         <jasypt-spring.version>3.0.4</jasypt-spring.version>
         <log4jdbc.version>1.16</log4jdbc.version>
-        <mybatis-spring.version>2.2.0</mybatis-spring.version>
-        <pagehelper-spring.version>1.3.1</pagehelper-spring.version>
+        <mybatis-spring.version>2.2.2</mybatis-spring.version>
+        <pagehelper-spring.version>1.4.5</pagehelper-spring.version>
         <swagger.version>3.0.0</swagger.version>
-        <tk.mybatis.version>2.1.5</tk.mybatis.version>
-        <zip4j.version>2.9.0</zip4j.version>
+        <tk.mybatis.version>4.2.1</tk.mybatis.version>
+        <zip4j.version>2.11.2</zip4j.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>persistence-api</artifactId>
-            <version>1.0</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -164,6 +164,16 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring-boot.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.3.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.10.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>

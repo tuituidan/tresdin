@@ -3,7 +3,7 @@ package com.tuituidan.tresdin.mybatis.handler;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.kingbase8.util.KBobject;
+import com.tuituidan.tresdin.mybatis.util.DbTypeUtils;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,10 +15,9 @@ import org.apache.ibatis.type.MappedJdbcTypes;
 import org.apache.ibatis.type.MappedTypes;
 import org.postgresql.util.PGobject;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
- * json类型，只验证了postgresql，kingbase，mysql，其他数据库需要中setNonNullParameter中添加对应转换.
+ * json类型，只验证了postgresql，mysql，其他数据库需要中setNonNullParameter中添加对应转换.
  *
  * @author tuituidan
  * @version 1.0
@@ -30,10 +29,6 @@ import org.springframework.util.ClassUtils;
 public class JsonTypeHandler extends BaseTypeHandler<Object> {
 
     protected Class<?> cls;
-
-    private static final String PG_OBJECT_CLASS = "org.postgresql.util.PGobject";
-
-    private static final String KB_OBJECT_CLASS = "com.kingbase8.util.KBobject";
 
     /**
      * JsonTypeHandler
@@ -48,15 +43,8 @@ public class JsonTypeHandler extends BaseTypeHandler<Object> {
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, Object parameter, JdbcType jdbcType)
             throws SQLException {
-        if (hasClass(PG_OBJECT_CLASS)) {
+        if (DbTypeUtils.isPostgresql()) {
             PGobject jsonObject = new PGobject();
-            jsonObject.setType("json");
-            jsonObject.setValue(JSON.toJSONString(parameter));
-            ps.setObject(i, jsonObject);
-            return;
-        }
-        if (hasClass(KB_OBJECT_CLASS)) {
-            KBobject jsonObject = new KBobject();
             jsonObject.setType("json");
             jsonObject.setValue(JSON.toJSONString(parameter));
             ps.setObject(i, jsonObject);
@@ -89,15 +77,6 @@ public class JsonTypeHandler extends BaseTypeHandler<Object> {
             return JSON.toJavaObject(JSON.parseArray(columnValue), this.cls);
         }
         return JSON.toJavaObject(JSON.parseObject(columnValue), this.cls);
-    }
-
-    private boolean hasClass(String clsName) {
-        try {
-            ClassUtils.forName(clsName, JsonTypeHandler.class.getClassLoader());
-            return true;
-        } catch (ClassNotFoundException | LinkageError e) {
-            return false;
-        }
     }
 
 }

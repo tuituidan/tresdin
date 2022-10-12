@@ -5,8 +5,6 @@ import com.ulisesbocchio.jasyptspringboot.detector.DefaultPropertyDetector;
 import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor;
 import org.jasypt.encryption.pbe.config.SimpleStringPBEConfig;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,8 +16,13 @@ import org.springframework.context.annotation.Configuration;
  * @date 2021/9/10
  */
 @Configuration
-@ConditionalOnClass({StringEncryptor.class, EncryptablePropertyDetector.class})
 public class StringEncryptorConfig {
+
+    public static void main(String[] args) {
+        StringEncryptor encryptor = new StringEncryptorConfig().stringEncryptor();
+        String username = encryptor.encrypt("root");
+        System.out.println(username);
+    }
 
     /**
      * 设置加解密算法.
@@ -27,7 +30,6 @@ public class StringEncryptorConfig {
      * @return StringEncryptor
      */
     @Bean("jasyptStringEncryptor")
-    @ConditionalOnMissingBean
     public StringEncryptor stringEncryptor() {
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
         config.setPassword("pp57@dxd");
@@ -48,7 +50,6 @@ public class StringEncryptorConfig {
      * @return EncryptablePropertyDetector
      */
     @Bean
-    @ConditionalOnMissingBean
     public EncryptablePropertyDetector encryptablePropertyDetector() {
         return new DefaultPropertyDetector("ENC#", "");
     }

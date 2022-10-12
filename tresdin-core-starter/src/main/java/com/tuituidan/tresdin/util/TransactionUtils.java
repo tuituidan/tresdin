@@ -4,10 +4,10 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * TransactionUtils.
+ * 编程式事务.
  *
  * @author tuituidan
  * @version 1.0
@@ -16,17 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class TransactionUtils implements ApplicationContextAware {
 
-    private static TransactionUtils transactionUtils;
-
-    /**
-     * 事务处理.
-     *
-     * @param runnable runnable
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public void run(Runnable runnable) {
-        runnable.run();
-    }
+    private static TransactionTemplate transactionTemplate;
 
     /**
      * 事务处理.
@@ -34,15 +24,18 @@ public class TransactionUtils implements ApplicationContextAware {
      * @param runnable runnable
      */
     public static void execute(Runnable runnable) {
-        transactionUtils.run(runnable);
+        transactionTemplate.execute(status -> {
+            runnable.run();
+            return null;
+        });
     }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        TransactionUtils.init(applicationContext.getBean(TransactionUtils.class));
+        init(applicationContext.getBean(TransactionTemplate.class));
     }
 
-    private static void init(TransactionUtils transactionUtil) {
-        transactionUtils = transactionUtil;
+    private static void init(TransactionTemplate template) {
+        transactionTemplate = template;
     }
 }

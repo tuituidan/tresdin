@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2021/9/25
  */
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/data-dict")
 public class DictionaryController {
 
     @Resource
@@ -52,7 +52,7 @@ public class DictionaryController {
      *
      * @return Void
      */
-    @GetMapping("/dict/actions/reload_cache")
+    @GetMapping("/actions/reload_cache")
     public ResponseEntity<Void> reloadCache() {
         dictionaryService.reloadCache();
         return ResponseEntity.noContent().build();

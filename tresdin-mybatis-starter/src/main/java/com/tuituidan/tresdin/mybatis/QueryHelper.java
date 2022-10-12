@@ -102,6 +102,8 @@ public class QueryHelper {
      * @return PageData PageData
      */
     public static <T> PageData<T> queryPage(PageParam pageParam, Supplier<T> supplier, Class<?> cls) {
+        Assert.notNull(pageParam.getOffset(), "分页参数offset不能为null");
+        Assert.notNull(pageParam.getLimit(), "分页参数limit不能为null");
         Page<T> page = offsetPage(pageParam.getOffset(), pageParam.getLimit());
         page.setOrderBy(formatSort(pageParam.getSort(), cls));
         PageData<T> pageData = new PageData<>();
