@@ -1,6 +1,7 @@
 package com.tuituidan.tresdin.dictionary;
 
 import com.tuituidan.tresdin.dictionary.bean.DictInfo;
+import com.tuituidan.tresdin.dictionary.bean.DictTree;
 import java.util.List;
 
 /**
@@ -30,7 +31,16 @@ public interface IDictionaryService {
     DictInfo getDict(String type, String code);
 
     /**
+     * getDictType
+     *
+     * @param type type
+     * @return List
+     */
+    List<DictTree> getDictTreeByType(String type);
+
+    /**
      * reloadCache
      */
     void reloadCache();
+
 }

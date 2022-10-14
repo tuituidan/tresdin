@@ -2,6 +2,7 @@ package com.tuituidan.tresdin.dict.controller;
 
 import com.tuituidan.tresdin.dictionary.IDictionaryService;
 import com.tuituidan.tresdin.dictionary.bean.DictInfo;
+import com.tuituidan.tresdin.dictionary.bean.DictTree;
 import java.util.List;
 import javax.annotation.Resource;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,17 @@ public class DictionaryController {
     @GetMapping("/type/{type}/dict")
     public ResponseEntity<List<DictInfo>> getDictInfoList(@PathVariable("type") String type) {
         return ResponseEntity.ok(dictionaryService.getDictList(type));
+    }
+
+    /**
+     * getDictTreeByType
+     *
+     * @param type type
+     * @return List
+     */
+    @GetMapping("/type/{type}/tree")
+    public ResponseEntity<List<DictTree>> getDictTreeByType(@PathVariable("type") String type) {
+        return ResponseEntity.ok(dictionaryService.getDictTreeByType(type));
     }
 
     /**

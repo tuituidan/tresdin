@@ -16,6 +16,7 @@ import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
@@ -180,48 +181,48 @@ public class DataTranslateService {
         JSONObject result = valueWrapper.getResult();
         final String fieldName = field.getName();
 
-        Annotation translatorAnnotation = getTranslatorAnnotation(field);
-        if (translatorAnnotation != null) {
+        List<Annotation> translatorAnnotationList = getTranslatorAnnotation(field);
+        if (CollectionUtils.isNotEmpty(translatorAnnotationList)) {
             TranslateToString translateToStringAnnotation = field.getAnnotation(TranslateToString.class);
             Collector collector = Objects.nonNull(translateToStringAnnotation)
                     ? Collectors.joining(translateToStringAnnotation.separator()) : Collectors.toList();
-            ITranslator<?> translator = translatorMap.get(translatorAnnotation.annotationType());
-            Object resultList =
-                    compatibleStream(value)
-                            .map(e -> translator.translate(
-                                    new TranslationParameter(translatorAnnotation, e, valueWrapper.getObj())))
-                            .collect(collector);
-            result.put(translator.getFieldName(fieldName), resultList);
-        } else {
-            if (deep && !(value instanceof JSONArray)) {
-                // 根据集合中的第一个数据来判断集合中存储的数据类型
-                final Object collFirstData = getCollectionFirstData(value);
-                if (!isParseableObject(collFirstData)) {
-                    return;
-                }
-                JSONArray array = new JSONArray();
-                compatibleStream(value).forEach(obj -> {
-                    Object subResult = JSON.toJSON(obj);
-                    if (subResult instanceof JSONObject) {
-                        array.add(subResult);
-                        allStatck.addFirst(new ValueWrapper(null, obj, (JSONObject) subResult, ParseType.OBJECT, null));
-                    }
-                });
-                result.put(fieldName, array);
+            for (Annotation translatorAnnotation : translatorAnnotationList) {
+                ITranslator<?> translator = translatorMap.get(translatorAnnotation.annotationType());
+                Object resultList =
+                        compatibleStream(value)
+                                .map(e -> translator.translate(
+                                        new TranslationParameter(translatorAnnotation, e, valueWrapper.getObj())))
+                                .collect(collector);
+                result.put(translator.getFieldName(fieldName), resultList);
             }
+            return;
+        }
+        if (deep && !(value instanceof JSONArray)) {
+            // 根据集合中的第一个数据来判断集合中存储的数据类型
+            final Object collFirstData = getCollectionFirstData(value);
+            if (!isParseableObject(collFirstData)) {
+                return;
+            }
+            JSONArray array = new JSONArray();
+            compatibleStream(value).forEach(obj -> {
+                Object subResult = JSON.toJSON(obj);
+                if (subResult instanceof JSONObject) {
+                    array.add(subResult);
+                    allStatck.addFirst(new ValueWrapper(null, obj, (JSONObject) subResult, ParseType.OBJECT, null));
+                }
+            });
+            result.put(fieldName, array);
         }
     }
 
     private Stream<?> compatibleStream(Object value) {
-        Stream<?> stream = null;
         if (value instanceof Collection) {
-            stream = ((Collection) value).stream();
-        } else if (value.getClass().isArray()) {
-            stream = Arrays.stream((Object[]) value);
-        } else {
-            stream = ((JSONArray) JSON.toJSON(value)).stream();
+            return ((Collection) value).stream();
         }
-        return stream;
+        if (value.getClass().isArray()) {
+            return Arrays.stream((Object[]) value);
+        }
+        return ((JSONArray) JSON.toJSON(value)).stream();
     }
 
     private void translateObjectField(ValueWrapper valueWrapper, Deque<ValueWrapper> allStatck, boolean deep) {
@@ -229,19 +230,21 @@ public class DataTranslateService {
         Object value = valueWrapper.getValue();
         JSONObject result = valueWrapper.getResult();
         final String fieldName = field.getName();
-        Annotation translatorAnnotation = getTranslatorAnnotation(field);
-        if (translatorAnnotation != null) {
-            ITranslator<?> translator = translatorMap.get(translatorAnnotation.annotationType());
-            String translateText = translator.translate(new TranslationParameter(translatorAnnotation, value,
-                    valueWrapper.getObj()));
-            result.put(translator.getFieldName(fieldName), translateText);
-        } else {
-            if (deep && isParseableObject(value)) {
-                Object subResult = JSON.toJSON(value);
-                if (subResult instanceof JSONObject) {
-                    result.put(fieldName, subResult);
-                    allStatck.addFirst(new ValueWrapper(null, value, (JSONObject) subResult, ParseType.OBJECT, null));
-                }
+        List<Annotation> translatorAnnotationList = getTranslatorAnnotation(field);
+        if (CollectionUtils.isNotEmpty(translatorAnnotationList)) {
+            for (Annotation translatorAnnotation : translatorAnnotationList) {
+                ITranslator<?> translator = translatorMap.get(translatorAnnotation.annotationType());
+                String translateText = translator.translate(new TranslationParameter(translatorAnnotation, value,
+                        valueWrapper.getObj()));
+                result.put(translator.getFieldName(fieldName), translateText);
+            }
+            return;
+        }
+        if (deep && isParseableObject(value)) {
+            Object subResult = JSON.toJSON(value);
+            if (subResult instanceof JSONObject) {
+                result.put(fieldName, subResult);
+                allStatck.addFirst(new ValueWrapper(null, value, (JSONObject) subResult, ParseType.OBJECT, null));
             }
         }
     }
@@ -293,14 +296,15 @@ public class DataTranslateService {
                 || clazz.isEnum();
     }
 
-    private Annotation getTranslatorAnnotation(Field field) {
+    private List<Annotation> getTranslatorAnnotation(Field field) {
+        List<Annotation> result = new ArrayList<>();
         for (Class c : translatorMap.keySet()) {
             Annotation translatorAnnotation = field.getAnnotation(c);
             if (Objects.nonNull(translatorAnnotation)) {
-                return translatorAnnotation;
+                result.add(translatorAnnotation);
             }
         }
-        return null;
+        return result;
     }
 
     enum ParseType {
