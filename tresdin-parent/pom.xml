@@ -33,7 +33,6 @@
         <log4jdbc.version>1.16</log4jdbc.version>
         <mybatis-spring.version>2.2.2</mybatis-spring.version>
         <pagehelper-spring.version>1.4.5</pagehelper-spring.version>
-        <swagger.version>3.0.0</swagger.version>
         <tk.mybatis.version>4.2.1</tk.mybatis.version>
         <zip4j.version>2.11.2</zip4j.version>
     </properties>
@@ -77,11 +76,6 @@
                 <groupId>com.tuituidan.tresdin</groupId>
                 <artifactId>tresdin-dictionary-starter</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-boot-starter</artifactId>
-                <version>${swagger.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.ulisesbocchio</groupId>

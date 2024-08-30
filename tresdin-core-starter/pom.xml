@@ -32,10 +32,6 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-        </dependency>
         <!--开启 cache 缓存 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
