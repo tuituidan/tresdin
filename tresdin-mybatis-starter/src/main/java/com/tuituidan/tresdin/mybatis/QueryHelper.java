@@ -6,9 +6,8 @@ import static com.github.pagehelper.page.PageMethod.offsetPage;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.page.PageMethod;
 import com.tuituidan.tresdin.consts.Separator;
-import com.tuituidan.tresdin.mybatis.bean.PageParam;
 import com.tuituidan.tresdin.page.PageData;
-import com.tuituidan.tresdin.util.StringExtUtils;
+import com.tuituidan.tresdin.util.BeanExtUtils;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -16,12 +15,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.persistence.Column;
-import javax.persistence.Transient;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.util.Assert;
 
 /**
  * 查询封装.
@@ -37,17 +34,17 @@ public class QueryHelper {
      * 计算页数.
      *
      * @param total 数据总条数
-     * @param pageSize 每页条数
+     * @param limit 每页条数
      * @return 总页数
      */
-    public static int calcPageCount(long total, int pageSize) {
+    public static int calcPageCount(long total, int limit) {
         if (total == 0) {
             return 0;
         }
-        if (total <= pageSize) {
+        if (total <= limit) {
             return 1;
         }
-        return (int) (total + pageSize - 1) / pageSize;
+        return (int) (total + limit - 1) / limit;
     }
 
     /**
@@ -67,7 +64,28 @@ public class QueryHelper {
      * @param sort sort
      */
     public static void orderBy(String sort) {
-        PageMethod.orderBy(formatSort(sort));
+        PageMethod.orderBy(formatSort(sort, null, null));
+    }
+
+    /**
+     * 设置排序.
+     *
+     * @param sort sort
+     * @param nullBehavior null的默认排序
+     */
+    public static void orderBy(String sort, String nullBehavior) {
+        PageMethod.orderBy(formatSort(sort, null, nullBehavior));
+    }
+
+    /**
+     * 设置排序.
+     *
+     * @param sort sort
+     * @param cls cls
+     * @param nullBehavior null的默认排序
+     */
+    public static void orderBy(String sort, Class<?> cls, String nullBehavior) {
+        PageMethod.orderBy(formatSort(sort, cls, nullBehavior));
     }
 
     /**
@@ -77,44 +95,32 @@ public class QueryHelper {
      * @param cls cls
      */
     public static void orderBy(String sort, Class<?> cls) {
-        PageMethod.orderBy(formatSort(sort, cls));
+        PageMethod.orderBy(formatSort(sort, cls, null));
     }
 
     /**
-     * 分页查询，不转换排序字段.
+     * 分页查询.
      *
-     * @param pageParam 分页参数
+     * @param offset 分页参数offset
+     * @param limit 分页参数limit
      * @param supplier 执行方法
      * @param <T> T
      * @return PageData PageData
      */
-    public static <T> PageData<T> queryPage(PageParam pageParam, Supplier<T> supplier) {
-        return queryPage(pageParam, supplier, null);
-    }
-
-    /**
-     * 分页查询，转换排序字段.
-     *
-     * @param pageParam 分页参数
-     * @param supplier 执行方法
-     * @param cls cls
-     * @param <T> T
-     * @return PageData PageData
-     */
-    public static <T> PageData<T> queryPage(PageParam pageParam, Supplier<T> supplier, Class<?> cls) {
-        Assert.notNull(pageParam.getOffset(), "分页参数offset不能为null");
-        Assert.notNull(pageParam.getLimit(), "分页参数limit不能为null");
-        Page<T> page = offsetPage(pageParam.getOffset(), pageParam.getLimit());
-        page.setOrderBy(formatSort(pageParam.getSort(), cls));
+    public static <T> PageData<T> queryPage(int offset, int limit, Supplier<T> supplier) {
         PageData<T> pageData = new PageData<>();
+        Page<T> page = offsetPage(offset, limit);
         try {
             pageData.setData(supplier.get());
         } finally {
             clearPage();
         }
-        pageData.setLimit(pageParam.getLimit());
-        pageData.setOffset(pageParam.getOffset());
         pageData.setTotal(page.getTotal());
+        pageData.setLimit(limit);
+        pageData.setOffset(offset);
+        pageData.setPageCount(page.getPages());
+        pageData.setPageIndex(page.getPageNum());
+        pageData.setIndex(offset + 1);
         return pageData;
     }
 
@@ -131,9 +137,8 @@ public class QueryHelper {
             Function<T, R> transFunc) {
         PageData<List<R>> result = new PageData<>();
         result.setData(pageData.getData().stream().map(transFunc).collect(Collectors.toList()));
-        result.setLimit(pageData.getLimit());
-        result.setOffset(pageData.getOffset());
-        result.setTotal(pageData.getTotal());
+        BeanExtUtils.copyProperties(pageData, result, "offset", "limit", "total", "index", "pageCount",
+                "pageIndex", "customData");
         return result;
     }
 
@@ -141,53 +146,33 @@ public class QueryHelper {
      * 转换restful格式的排序字段.
      *
      * @param sort sort
-     * @return string
-     */
-    public static String formatSort(String sort) {
-        return formatSort(sort, null);
-    }
-
-    /**
-     * 转换restful格式的排序字段.
-     *
-     * @param sort sort
      * @param cls cls
+     * @param nullBehavior null的默认排序
      * @return string
      */
-    public static String formatSort(String sort, Class<?> cls) {
+    public static String formatSort(String sort, Class<?> cls, String nullBehavior) {
         if (StringUtils.isBlank(sort)) {
             return sort;
         }
         return Arrays.stream(sort.split(Separator.COMMA)).map(fieldName -> {
-            // pg排序默认就是（升序） asc nulls last
             String direction = "";
             if (fieldName.startsWith(Separator.HYPHEN)) {
                 fieldName = StringUtils.substringAfter(fieldName, Separator.HYPHEN);
-                direction = " desc nulls last";
+                direction = " desc " + StringUtils.defaultString(nullBehavior);
             }
-            Column column = getColumn(fieldName, cls);
+            if (cls == null) {
+                return fieldName + direction;
+            }
+            Field field = FieldUtils.getField(cls, fieldName, true);
+            if (field == null) {
+                return fieldName + direction;
+            }
+            Column column = AnnotationUtils.findAnnotation(field, Column.class);
             if (column == null) {
                 return fieldName + direction;
             }
             return column.name() + direction;
         }).collect(Collectors.joining(Separator.COMMA));
-    }
-
-    private static Column getColumn(String fieldName, Class<?> cls) {
-        if (cls == null) {
-            return null;
-        }
-        Field field = FieldUtils.getField(cls, fieldName, true);
-        if (field == null) {
-            return null;
-        }
-        Column column = AnnotationUtils.findAnnotation(field, Column.class);
-        if (column == null) {
-            Assert.notNull(AnnotationUtils.findAnnotation(field, Transient.class),
-                    StringExtUtils.format("无法找到排序字段{}对应的数据库字段", fieldName));
-            return null;
-        }
-        return column;
     }
 
 }
