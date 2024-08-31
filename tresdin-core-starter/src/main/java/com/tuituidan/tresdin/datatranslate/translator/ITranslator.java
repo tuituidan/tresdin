@@ -19,7 +19,7 @@ public interface ITranslator<T> {
      * @return String
      */
     default String getFieldName(String fieldName) {
-        return fieldName + "TranslateText";
+        return fieldName + "Text";
     }
 
     /**
