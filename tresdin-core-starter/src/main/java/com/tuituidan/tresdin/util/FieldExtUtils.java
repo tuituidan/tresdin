@@ -89,4 +89,21 @@ public class FieldExtUtils {
         });
     }
 
+    private static final Map<Class<?>, Field> FIELD_KEY_CACHE = new ConcurrentReferenceHashMap<>(1024);
+
+    /**
+     * getModelKeyInCache
+     *
+     * @param cls cls
+     * @param key key
+     * @return Field
+     */
+    public static Field getModelKeyInCache(Class<?> cls, String key) {
+        return FIELD_KEY_CACHE.computeIfAbsent(cls, modelClass ->
+                Arrays.stream(modelClass.getDeclaredFields())
+                        .filter(it -> key.equals(it.getName()))
+                        .findFirst().orElseThrow(NullPointerException::new)
+        );
+    }
+
 }

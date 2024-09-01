@@ -1,11 +1,13 @@
 package com.tuituidan.tresdin.mybatis.interceptor;
 
 import com.tuituidan.tresdin.mybatis.bean.IEntity;
+import com.tuituidan.tresdin.mybatis.util.SnowFlake;
+import com.tuituidan.tresdin.util.FieldExtUtils;
 import com.tuituidan.tresdin.util.StringExtUtils;
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Properties;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.binding.MapperMethod.ParamMap;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -16,6 +18,7 @@ import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * 自动设置默认字段.
@@ -52,11 +55,17 @@ public class EntitySetDefaultInterceptor implements Interceptor {
     }
 
     private void handlerEntity(Object obj, SqlCommandType commandType) {
-        IEntity<?> entity = (IEntity<?>) obj;
+        IEntity<?, ?> entity = (IEntity<?, ?>) obj;
         switch (commandType) {
             case INSERT:
-                if (StringUtils.isBlank(entity.getId())) {
-                    entity.setId(StringExtUtils.getUuid());
+                if (entity.getId() == null) {
+                    Field idField = FieldExtUtils.getModelKeyInCache(entity.getClass(), "id");
+                    ReflectionUtils.makeAccessible(idField);
+                    if (String.class.equals(idField.getType())) {
+                        ReflectionUtils.setField(idField, entity, StringExtUtils.getUuid());
+                    } else if (Long.class.equals(idField.getType())) {
+                        ReflectionUtils.setField(idField, entity, SnowFlake.newId());
+                    }
                 }
                 if (entity.getCreateTime() == null) {
                     entity.setCreateTime(LocalDateTime.now());
@@ -80,4 +89,5 @@ public class EntitySetDefaultInterceptor implements Interceptor {
     public void setProperties(Properties properties) {
         // 这里可以不用实现.
     }
+
 }

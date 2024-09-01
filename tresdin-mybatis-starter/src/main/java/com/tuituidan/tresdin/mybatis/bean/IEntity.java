@@ -11,14 +11,14 @@ import java.time.LocalDateTime;
  * @version 1.0
  * @date 2020/12/11
  */
-public interface IEntity<T> extends Serializable {
+public interface IEntity<T, K> extends Serializable {
 
     /**
      * getId.
      *
-     * @return String
+     * @return T
      */
-    String getId();
+    K getId();
 
     /**
      * setId.
@@ -26,7 +26,7 @@ public interface IEntity<T> extends Serializable {
      * @param id id
      * @return T
      */
-    T setId(String id);
+    T setId(K id);
 
     /**
      * getCreateTime.
@@ -57,4 +57,5 @@ public interface IEntity<T> extends Serializable {
      * @return T
      */
     T setUpdateTime(LocalDateTime updateTime);
+
 }
