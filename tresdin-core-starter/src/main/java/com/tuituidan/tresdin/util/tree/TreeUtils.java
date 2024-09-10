@@ -70,11 +70,11 @@ public class TreeUtils {
             }
             List<T> children = treeMap.get(item.getId());
             if (CollectionUtils.isNotEmpty(children)) {
-                children.sort(Comparator.comparingInt(T::getSort));
+                children.sort(Comparator.comparing(T::getSort, Comparator.nullsLast(Integer::compareTo)));
             }
             item.setChildren(children);
         }
-        treeList.sort(Comparator.comparing(T::getSort));
+        treeList.sort(Comparator.comparing(T::getSort, Comparator.nullsLast(Integer::compareTo)));
         return treeList;
     }
 

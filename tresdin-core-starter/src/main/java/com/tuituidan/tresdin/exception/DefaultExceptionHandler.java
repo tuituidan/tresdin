@@ -8,6 +8,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
@@ -88,7 +90,8 @@ public class DefaultExceptionHandler {
     @ExceptionHandler(Throwable.class)
     public ExceptionBody exception(Throwable throwable) {
         log.error(throwable.getMessage(), throwable);
-        return new ExceptionBody(HttpStatus.INTERNAL_SERVER_ERROR, throwable.getMessage());
+        return new ExceptionBody(HttpStatus.INTERNAL_SERVER_ERROR,
+                StringUtils.defaultString(throwable.getMessage(), ExceptionUtils.getStackTrace(throwable)));
     }
 
 }

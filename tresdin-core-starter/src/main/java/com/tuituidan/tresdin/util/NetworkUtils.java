@@ -2,7 +2,9 @@ package com.tuituidan.tresdin.util;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
@@ -25,6 +27,23 @@ public class NetworkUtils {
     private static String localIp = "";
 
     private static String localUrl = "";
+
+    /**
+     * isConnected
+     *
+     * @param ip ip
+     * @param port port
+     * @param timeout timeout
+     * @return boolean
+     */
+    public static boolean isConnected(String ip, int port, int timeout) {
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress(ip, port), timeout);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
 
     /**
      * 本地地址
