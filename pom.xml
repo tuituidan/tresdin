@@ -13,6 +13,7 @@
         <module>tresdin-interface</module>
         <module>tresdin-dictionary-starter</module>
         <module>tresdin-mybatis-starter</module>
+        <module>tresdin-schedule-task-starter</module>
     </modules>
     <packaging>pom</packaging>
     <properties>
