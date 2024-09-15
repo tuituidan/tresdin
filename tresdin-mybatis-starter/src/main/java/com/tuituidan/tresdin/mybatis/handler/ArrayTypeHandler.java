@@ -1,5 +1,7 @@
 package com.tuituidan.tresdin.mybatis.handler;
 
+import com.tuituidan.tresdin.consts.Separator;
+import com.tuituidan.tresdin.mybatis.util.DbTypeUtils;
 import java.sql.Array;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -9,6 +11,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedJdbcTypes;
@@ -40,11 +43,14 @@ public class ArrayTypeHandler extends BaseTypeHandler<Object[]> {
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, Object[] parameter, JdbcType jdbcType)
             throws SQLException {
-        String typeName = TYPE_MAP.get(parameter.getClass());
-        Assert.hasText(typeName, "不支持的数组类型-" + parameter.getClass().getName());
-        Connection conn = ps.getConnection();
-        Array array = conn.createArrayOf(TYPE_MAP.get(parameter.getClass()), parameter);
-        ps.setArray(i, array);
+        if (DbTypeUtils.isPostgresql()) {
+            String typeName = TYPE_MAP.get(parameter.getClass());
+            Assert.hasText(typeName, "不支持的数组类型-" + parameter.getClass().getName());
+            Connection conn = ps.getConnection();
+            Array array = conn.createArrayOf(TYPE_MAP.get(parameter.getClass()), parameter);
+            ps.setArray(i, array);
+        }
+        ps.setString(i, StringUtils.join(parameter, Separator.SEMICOLON));
     }
 
     /**
@@ -57,17 +63,31 @@ public class ArrayTypeHandler extends BaseTypeHandler<Object[]> {
      */
     @Override
     public Object[] getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        return getArray(rs.getArray(columnName));
+        if (DbTypeUtils.isPostgresql()) {
+            return getArray(rs.getArray(columnName));
+        }
+        return getArray(rs.getString(columnName));
+
     }
 
     @Override
     public Object[] getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-        return getArray(rs.getArray(columnIndex));
+        if (DbTypeUtils.isPostgresql()) {
+            return getArray(rs.getArray(columnIndex));
+        }
+        return getArray(rs.getString(columnIndex));
     }
 
     @Override
     public Object[] getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        return getArray(cs.getArray(columnIndex));
+        if (DbTypeUtils.isPostgresql()) {
+            return getArray(cs.getArray(columnIndex));
+        }
+        return getArray(cs.getString(columnIndex));
+    }
+
+    private Object[] getArray(String array) {
+        return StringUtils.split(array, Separator.SEMICOLON);
     }
 
     private Object[] getArray(Array array) {
