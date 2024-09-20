@@ -1,9 +1,13 @@
 package com.tuituidan.tresdin.util;
 
+import com.tuituidan.tresdin.consts.Separator;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.experimental.UtilityClass;
 import org.slf4j.helpers.MessageFormatter;
@@ -42,7 +46,7 @@ public class StringExtUtils {
      * 使用 Slf4j 中的字符串格式化方式来格式化字符串.
      *
      * @param pattern 待格式化的字符串
-     * @param args    参数
+     * @param args 参数
      * @return 格式化后的字符串
      */
     public static String format(String pattern, Object... args) {
@@ -76,4 +80,22 @@ public class StringExtUtils {
             throw new IllegalArgumentException(var2);
         }
     }
+
+    /**
+     * 模版替换.
+     *
+     * @param source source
+     * @param params params
+     * @return String
+     */
+    public static String template(String source, Map<String, Object> params) {
+        if (source.contains(Separator.POUND)) {
+            return ExpParserUtils.template(source, params);
+        }
+        for (Entry<String, Object> entry : params.entrySet()) {
+            source = source.replace("{" + entry.getKey() + "}", Objects.toString(entry.getValue()));
+        }
+        return source;
+    }
+
 }
