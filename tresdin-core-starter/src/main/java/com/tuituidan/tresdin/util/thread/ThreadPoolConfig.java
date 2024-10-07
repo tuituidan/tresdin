@@ -1,5 +1,6 @@
 package com.tuituidan.tresdin.util.thread;
 
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -42,5 +43,10 @@ public class ThreadPoolConfig {
      * 队列大小.
      */
     private Integer queueSize;
+
+    /**
+     * 扩展线程池
+     */
+    private Map<String, ThreadPoolConfig> extPool;
 
 }
