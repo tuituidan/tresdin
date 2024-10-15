@@ -1,5 +1,6 @@
 package com.tuituidan.tresdin.util;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.BooleanUtils;
@@ -24,6 +25,22 @@ public class ExpParserUtils {
      * 执行.
      *
      * @param exp 表达式
+     * @param data 参数
+     * @return Object
+     */
+    public static boolean evaluate(String exp, Object data) {
+        EvaluationContext context = new StandardEvaluationContext();
+        Field[] fields = FieldExtUtils.getFields(data.getClass());
+        for (Field field : fields) {
+            context.setVariable(field.getName(), FieldExtUtils.getFieldValue(field, data));
+        }
+        return BooleanUtils.isTrue(PARSER.parseExpression(exp).getValue(context, Boolean.class));
+    }
+
+    /**
+     * 执行.
+     *
+     * @param exp 表达式
      * @param map 参数
      * @return Object
      */
@@ -43,6 +60,22 @@ public class ExpParserUtils {
     public static String template(String source, Map<String, Object> params) {
         EvaluationContext context = new StandardEvaluationContext();
         params.forEach(context::setVariable);
+        return PARSER.parseExpression(source).getValue(context, String.class);
+    }
+
+    /**
+     * 模版替换.
+     *
+     * @param source source
+     * @param params params
+     * @return String
+     */
+    public static String template(String source, Object params) {
+        EvaluationContext context = new StandardEvaluationContext();
+        Field[] fields = FieldExtUtils.getFields(params.getClass());
+        for (Field field : fields) {
+            context.setVariable(field.getName(), FieldExtUtils.getFieldValue(field, params));
+        }
         return PARSER.parseExpression(source).getValue(context, String.class);
     }
 
