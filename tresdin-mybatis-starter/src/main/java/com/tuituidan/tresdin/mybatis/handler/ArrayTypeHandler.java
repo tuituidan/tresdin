@@ -49,6 +49,7 @@ public class ArrayTypeHandler extends BaseTypeHandler<Object[]> {
             Connection conn = ps.getConnection();
             Array array = conn.createArrayOf(TYPE_MAP.get(parameter.getClass()), parameter);
             ps.setArray(i, array);
+            return;
         }
         ps.setString(i, StringUtils.join(parameter, Separator.SEMICOLON));
     }
