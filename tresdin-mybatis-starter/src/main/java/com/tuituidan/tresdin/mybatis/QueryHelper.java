@@ -11,6 +11,7 @@ import com.tuituidan.tresdin.util.BeanExtUtils;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -45,6 +46,30 @@ public class QueryHelper {
             return 1;
         }
         return (int) (total + limit - 1) / limit;
+    }
+
+    /**
+     * 遍历所有分页数据
+     *
+     * @param limit 分页大小
+     * @param supplier 查询方法
+     * @param consumer 回调方法
+     * @param <T> T
+     */
+    public static <T> void iteratePageList(int limit, Supplier<T> supplier, Consumer<PageData<T>> consumer) {
+        long total = count(supplier);
+        int pageCount = calcPageCount(total, limit);
+        if (pageCount <= 0) {
+            PageData<T> pageData = new PageData<>();
+            pageData.setLimit(limit);
+            pageData.setPageCount(pageCount);
+            pageData.setTotal(total);
+            consumer.accept(pageData);
+            return;
+        }
+        for (int i = 0; i < pageCount; i++) {
+            consumer.accept(queryPage(i * limit, limit, supplier));
+        }
     }
 
     /**
