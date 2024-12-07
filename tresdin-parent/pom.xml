@@ -32,6 +32,7 @@
         <jasypt-spring.version>3.0.4</jasypt-spring.version>
         <log4jdbc.version>1.16</log4jdbc.version>
         <mybatis-spring.version>2.2.2</mybatis-spring.version>
+        <mybatis.version>3.5.9</mybatis.version>
         <pagehelper-spring.version>1.4.5</pagehelper-spring.version>
         <tk.mybatis.version>4.2.1</tk.mybatis.version>
         <zip4j.version>2.11.2</zip4j.version>
@@ -70,6 +71,11 @@
             <dependency>
                 <groupId>com.tuituidan.tresdin</groupId>
                 <artifactId>tresdin-mybatis-starter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.tuituidan.tresdin</groupId>
+                <artifactId>tresdin-mybatis-crypto-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -124,6 +130,11 @@
                 <version>${easyexcel.version}</version>
             </dependency>
             <!-- mybatis -->
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>
                 <artifactId>mybatis-spring-boot-starter</artifactId>
