@@ -68,7 +68,7 @@ public class QueryHelper {
             return;
         }
         for (int i = 0; i < pageCount; i++) {
-            consumer.accept(queryPage(i * limit, limit, supplier));
+            consumer.accept(queryPage(i * limit, limit, supplier, false));
         }
     }
 
@@ -133,8 +133,22 @@ public class QueryHelper {
      * @return PageData PageData
      */
     public static <T> PageData<T> queryPage(int offset, int limit, Supplier<T> supplier) {
+        return queryPage(offset, limit, supplier, true);
+    }
+
+    /**
+     * 分页查询.
+     *
+     * @param offset 分页参数offset
+     * @param limit 分页参数limit
+     * @param supplier 执行方法
+     * @param doCount 执行总数统计
+     * @param <T> T
+     * @return PageData PageData
+     */
+    public static <T> PageData<T> queryPage(int offset, int limit, Supplier<T> supplier, boolean doCount) {
         PageData<T> pageData = new PageData<>();
-        Page<T> page = offsetPage(offset, limit);
+        Page<T> page = offsetPage(offset, limit, doCount);
         try {
             pageData.setData(supplier.get());
         } finally {
