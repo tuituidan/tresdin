@@ -13,6 +13,7 @@ import java.util.Objects;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
@@ -68,7 +69,8 @@ public class ParameterHandlerInterceptor implements Interceptor {
             }
             return;
         }
-        for (Field field : source.getClass().getDeclaredFields()) {
+        Field[] fields = FieldUtils.getAllFields(source.getClass());
+        for (Field field : fields) {
             encryptField(field, source);
         }
     }

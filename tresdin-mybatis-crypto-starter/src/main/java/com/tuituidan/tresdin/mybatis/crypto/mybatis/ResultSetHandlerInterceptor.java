@@ -15,6 +15,7 @@ import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
@@ -76,7 +77,7 @@ public class ResultSetHandlerInterceptor implements Interceptor {
             }
             return;
         }
-        Field[] fields = source.getClass().getDeclaredFields();
+        Field[] fields = FieldUtils.getAllFields(source.getClass());
         for (Field field : fields) {
             decryptField(field, source);
         }
