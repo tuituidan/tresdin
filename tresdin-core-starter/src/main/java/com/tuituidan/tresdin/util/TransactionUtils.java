@@ -1,5 +1,6 @@
 package com.tuituidan.tresdin.util;
 
+import java.util.concurrent.Callable;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -30,6 +31,23 @@ public class TransactionUtils implements ApplicationContextAware {
         });
     }
 
+    /**
+     * 事务处理（带返回值）
+     *
+     * @param callable callable
+     * @param <T> T
+     * @return T
+     */
+    public static <T> T execute(Callable<T> callable) {
+        return transactionTemplate.execute(status -> {
+            try {
+                return callable.call();
+            } catch (Exception e) {
+                throw new IllegalArgumentException(e);
+            }
+        });
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         init(applicationContext.getBean(TransactionTemplate.class));
@@ -38,4 +56,5 @@ public class TransactionUtils implements ApplicationContextAware {
     private static void init(TransactionTemplate template) {
         transactionTemplate = template;
     }
+
 }
