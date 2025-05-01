@@ -50,6 +50,9 @@ public class ParameterHandlerInterceptor implements Interceptor {
     }
 
     private void encryptObject(Object source) {
+        if (source == null) {
+            return;
+        }
         if (source instanceof Map) {
             for (Map.Entry<?, ?> param : ((Map<?, ?>) source).entrySet()) {
                 Object value = param.getValue();
@@ -69,19 +72,19 @@ public class ParameterHandlerInterceptor implements Interceptor {
             }
             return;
         }
-        Field[] fields = FieldUtils.getAllFields(source.getClass());
-        for (Field field : fields) {
-            encryptField(field, source);
-        }
+        encryptBean(source);
     }
 
-    private void encryptField(Field field, Object source) {
-        if (!field.isAnnotationPresent(CryptoField.class)) {
-            return;
+    private void encryptBean(Object source) {
+        Field[] fields = FieldUtils.getAllFields(source.getClass());
+        for (Field field : fields) {
+            if (!field.isAnnotationPresent(CryptoField.class)) {
+                continue;
+            }
+            ReflectionUtils.makeAccessible(field);
+            Object value = ReflectionUtils.getField(field, source);
+            ReflectionUtils.setField(field, source, encryptValue(value));
         }
-        ReflectionUtils.makeAccessible(field);
-        Object value = ReflectionUtils.getField(field, source);
-        ReflectionUtils.setField(field, source, encryptValue(value));
     }
 
     private Object encryptValue(Object value) {
