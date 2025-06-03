@@ -90,7 +90,7 @@ public class NetworkUtils {
                     InetAddress inetAddr = inetAddrs.nextElement();
                     if (isValidAddress(inetAddr)) {
                         localIp = inetAddr.getHostAddress();
-                        break;
+                        return localIp;
                     }
                 }
             }
