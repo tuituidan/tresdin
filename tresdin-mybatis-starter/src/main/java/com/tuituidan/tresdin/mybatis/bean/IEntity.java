@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
  * IEntity.
  *
  * @param <T> T
- * @author zhujunhan
+ * @author tuituidan
  * @version 1.0
  * @date 2020/12/11
  */

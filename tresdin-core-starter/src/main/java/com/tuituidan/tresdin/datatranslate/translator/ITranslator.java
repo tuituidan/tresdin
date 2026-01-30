@@ -28,6 +28,6 @@ public interface ITranslator<T> {
      * @param translationParameter 翻译用到的参数.
      * @return 翻译值
      */
-    String translate(TranslationParameter translationParameter);
+    Object translate(TranslationParameter translationParameter);
 
 }

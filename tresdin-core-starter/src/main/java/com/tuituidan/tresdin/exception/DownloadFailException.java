@@ -6,7 +6,7 @@ import com.tuituidan.tresdin.util.StringExtUtils;
 /**
  * 下载失败.
  *
- * @author zhujunhan
+ * @author tuituidan
  * @version 1.0
  * @date 2020/12/11
  */

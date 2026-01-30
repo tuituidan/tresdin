@@ -3,7 +3,7 @@ package com.tuituidan.tresdin.mybatis.util;
 /**
  * 简化版雪花算法，去掉了工作机器和数据中心，仅限单体服务使用，使用枚举实现单例.
  *
- * @author zhujunhan
+ * @author tuituidan
  * @version 1.0
  * @date 2023/2/7
  */

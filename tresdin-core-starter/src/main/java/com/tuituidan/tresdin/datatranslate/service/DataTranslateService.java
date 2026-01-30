@@ -3,6 +3,8 @@ package com.tuituidan.tresdin.datatranslate.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuituidan.tresdin.datatranslate.annotation.DeepTranslate;
 import com.tuituidan.tresdin.datatranslate.annotation.TranslateToString;
 import com.tuituidan.tresdin.datatranslate.bean.TranslationParameter;
@@ -28,6 +30,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +52,9 @@ public class DataTranslateService {
      */
     @Autowired(required = false)
     private List<ITranslator<?>> registeredTranslators;
+
+    @Resource
+    private ObjectMapper objectMapper;
 
     /**
      * key为该翻译器对应注解类型，value为翻译器实例.
@@ -125,7 +131,12 @@ public class DataTranslateService {
             return obj;
         }
         final boolean deep = obj.getClass().getAnnotation(DeepTranslate.class) != null;
-        final JSONObject rawResult = JSON.parseObject(JSON.toJSONString(obj));
+        final JSONObject rawResult;
+        try {
+            rawResult = JSON.parseObject(objectMapper.writeValueAsString(obj));
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(e);
+        }
         if (rawResult == null) {
             return obj;
         }
@@ -234,7 +245,7 @@ public class DataTranslateService {
         if (CollectionUtils.isNotEmpty(translatorAnnotationList)) {
             for (Annotation translatorAnnotation : translatorAnnotationList) {
                 ITranslator<?> translator = translatorMap.get(translatorAnnotation.annotationType());
-                String translateText = translator.translate(new TranslationParameter(translatorAnnotation, value,
+                Object translateText = translator.translate(new TranslationParameter(translatorAnnotation, value,
                         valueWrapper.getObj()));
                 result.put(translator.getFieldName(fieldName), translateText);
             }
