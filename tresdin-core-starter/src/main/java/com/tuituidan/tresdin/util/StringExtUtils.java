@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.helpers.MessageFormatter;
 
 /**
@@ -96,6 +97,17 @@ public class StringExtUtils {
             source = source.replace("{" + entry.getKey() + "}", Objects.toString(entry.getValue()));
         }
         return source;
+    }
+
+    /**
+     * 驼峰转下划线命名
+     */
+    public static String camelToUnderLineCase(String str) {
+        if (StringUtils.isBlank(str)) {
+            return str;
+        }
+        return StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(str),
+                Separator.UNDERLINE).toLowerCase();
     }
 
 }

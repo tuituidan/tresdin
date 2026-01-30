@@ -5,21 +5,14 @@ import static com.github.pagehelper.page.PageMethod.offsetPage;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.page.PageMethod;
-import com.tuituidan.tresdin.consts.Separator;
 import com.tuituidan.tresdin.page.PageData;
 import com.tuituidan.tresdin.util.BeanExtUtils;
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.persistence.Column;
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.springframework.core.annotation.AnnotationUtils;
 
 /**
  * 查询封装.
@@ -89,28 +82,7 @@ public class QueryHelper {
      * @param sort sort
      */
     public static void orderBy(String sort) {
-        PageMethod.orderBy(formatSort(sort, null, null));
-    }
-
-    /**
-     * 设置排序.
-     *
-     * @param sort sort
-     * @param nullBehavior null的默认排序
-     */
-    public static void orderBy(String sort, String nullBehavior) {
-        PageMethod.orderBy(formatSort(sort, null, nullBehavior));
-    }
-
-    /**
-     * 设置排序.
-     *
-     * @param sort sort
-     * @param cls cls
-     * @param nullBehavior null的默认排序
-     */
-    public static void orderBy(String sort, Class<?> cls, String nullBehavior) {
-        PageMethod.orderBy(formatSort(sort, cls, nullBehavior));
+        PageMethod.orderBy(SortBuilder.create(sort).build());
     }
 
     /**
@@ -120,7 +92,26 @@ public class QueryHelper {
      * @param cls cls
      */
     public static void orderBy(String sort, Class<?> cls) {
-        PageMethod.orderBy(formatSort(sort, cls, null));
+        PageMethod.orderBy(SortBuilder.create(sort).withEntity(cls).build());
+    }
+
+    /**
+     * 设置排序.
+     *
+     * @param sort sort
+     * @param isCamelCase 是否进行驼峰命名转下划线命名
+     */
+    public static void orderBy(String sort, boolean isCamelCase) {
+        PageMethod.orderBy(SortBuilder.create(sort).isCamelCase(isCamelCase).build());
+    }
+
+    /**
+     * 批量设置排序.
+     *
+     * @param sortBuilder sortBuilder
+     */
+    public static void orderBy(SortBuilder sortBuilder) {
+        PageMethod.orderBy(sortBuilder.build());
     }
 
     /**
@@ -179,39 +170,6 @@ public class QueryHelper {
         BeanExtUtils.copyProperties(pageData, result, "offset", "limit", "total", "index", "pageCount",
                 "pageIndex", "customData");
         return result;
-    }
-
-    /**
-     * 转换restful格式的排序字段.
-     *
-     * @param sort sort
-     * @param cls cls
-     * @param nullBehavior null的默认排序
-     * @return string
-     */
-    public static String formatSort(String sort, Class<?> cls, String nullBehavior) {
-        if (StringUtils.isBlank(sort)) {
-            return sort;
-        }
-        return Arrays.stream(sort.split(Separator.COMMA)).map(fieldName -> {
-            String direction = "";
-            if (fieldName.startsWith(Separator.HYPHEN)) {
-                fieldName = StringUtils.substringAfter(fieldName, Separator.HYPHEN);
-                direction = " desc " + StringUtils.defaultString(nullBehavior);
-            }
-            if (cls == null) {
-                return fieldName + direction;
-            }
-            Field field = FieldUtils.getField(cls, fieldName, true);
-            if (field == null) {
-                return fieldName + direction;
-            }
-            Column column = AnnotationUtils.findAnnotation(field, Column.class);
-            if (column == null) {
-                return fieldName + direction;
-            }
-            return column.name() + direction;
-        }).collect(Collectors.joining(Separator.COMMA));
     }
 
 }
