@@ -4,6 +4,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -11,6 +12,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 /**
  * SpringMailUtils.
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
  * @date 2026/1/31
  */
 @Component
+@ConditionalOnProperty(prefix = "spring.mail", name = "host")
 @Slf4j
 public class SpringMailUtils implements ApplicationContextAware {
 
@@ -35,6 +38,7 @@ public class SpringMailUtils implements ApplicationContextAware {
      * @param receiver receiver
      */
     public static void sendText(String subject, String content, String... receiver) {
+        checkConfig();
         SimpleMailMessage message = new SimpleMailMessage();
         message.setSubject(subject);
         message.setText(content);
@@ -51,6 +55,7 @@ public class SpringMailUtils implements ApplicationContextAware {
      * @param receiver receiver
      */
     public static void sendHtml(String subject, String content, String... receiver) {
+        checkConfig();
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -63,6 +68,10 @@ public class SpringMailUtils implements ApplicationContextAware {
             log.error("发送邮件失败", ex);
             throw new IllegalArgumentException("发送邮件失败", ex);
         }
+    }
+
+    private static void checkConfig() {
+        Assert.notNull(mailProperties, "请配置spring.mail相关配置");
     }
 
     @Override
