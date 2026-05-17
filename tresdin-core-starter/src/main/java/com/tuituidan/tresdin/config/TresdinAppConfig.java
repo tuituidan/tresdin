@@ -1,7 +1,10 @@
 package com.tuituidan.tresdin.config;
 
 import java.time.Duration;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -14,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
  * @date 2021/9/14
  */
 @Configuration
-public class TresdinAppConfig {
+public class TresdinAppConfig implements ApplicationListener<ApplicationReadyEvent> {
 
     /**
      * 连接超时时间.
@@ -37,6 +40,16 @@ public class TresdinAppConfig {
                 .setConnectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT))
                 .setReadTimeout(Duration.ofSeconds(READ_TIMEOUT))
                 .build();
+    }
+
+    @Override
+    public void onApplicationEvent(ApplicationReadyEvent event) {
+        String port = StringUtils.rightPad(event.getApplicationContext()
+                .getEnvironment().getProperty("local.server.port"), 5);
+        System.out.println("\n"
+                + "+---------------------------------+ \n"
+                + "| 程序启动成功，启动端口：" + port + "       | \n"
+                + "+---------------------------------+ \n");
     }
 
 }
