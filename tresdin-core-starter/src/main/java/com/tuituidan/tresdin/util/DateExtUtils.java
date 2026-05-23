@@ -1,5 +1,6 @@
 package com.tuituidan.tresdin.util;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -81,6 +82,38 @@ public class DateExtUtils {
                 Integer.parseInt(split[3]),
                 Integer.parseInt(split[4]),
                 Integer.parseInt(split[5]));
+    }
+
+    /**
+     * 毫秒数转可读时间描述.
+     *
+     * @param millis millis
+     * @return String
+     */
+    public static String durationFormat(long millis) {
+        Duration duration = Duration.ofMillis(millis);
+        StringBuilder sb = new StringBuilder();
+        long days = duration.toDays();
+        if (days > 0) {
+            sb.append(days).append("天");
+        }
+        long hours = duration.toHours() % 24;
+        if (hours > 0) {
+            sb.append(hours).append("时");
+        }
+        long minutes = duration.toMinutes() % 60;
+        if (minutes > 0) {
+            sb.append(minutes).append("分");
+        }
+        long seconds = duration.getSeconds() % 60;
+        if (seconds > 0) {
+            sb.append(seconds).append("秒");
+        }
+        long millisPart = duration.toMillis() % 1000;
+        if (millisPart > 0) {
+            sb.append(millisPart).append("毫秒");
+        }
+        return sb.toString();
     }
 
 }
