@@ -31,4 +31,19 @@ public enum JobStatus {
     private String code;
 
     private String name;
+
+    /**
+     * 根据code获取枚举.
+     *
+     * @param code code
+     * @return JobStatus
+     */
+    public static JobStatus of(String code) {
+        for (JobStatus value : values()) {
+            if (value.code.equals(code)) {
+                return value;
+            }
+        }
+        return null;
+    }
 }

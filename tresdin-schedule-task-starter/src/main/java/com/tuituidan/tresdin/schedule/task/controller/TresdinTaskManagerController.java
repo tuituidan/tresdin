@@ -1,7 +1,8 @@
 package com.tuituidan.tresdin.schedule.task.controller;
 
-import com.tuituidan.tresdin.consts.TresdinConsts;
-import com.tuituidan.tresdin.schedule.task.bean.TaskItemVo;
+import com.tuituidan.tresdin.schedule.task.bean.ScheduleTask;
+import com.tuituidan.tresdin.schedule.task.bean.ScheduleTaskLog;
+import com.tuituidan.tresdin.schedule.task.service.IScheduleTaskStorage;
 import com.tuituidan.tresdin.schedule.task.service.TresdinScheduleService;
 import java.util.List;
 import javax.annotation.Resource;
@@ -19,11 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2024/9/15
  */
 @RestController
-@RequestMapping(TresdinConsts.API_V1 + "/tresdin/schedule/task")
+@RequestMapping("/api/v1/tresdin/schedule/task")
 public class TresdinTaskManagerController {
 
     @Resource
     private TresdinScheduleService tresdinScheduleService;
+
+    @Resource
+    private IScheduleTaskStorage scheduleTaskStorage;
 
     /**
      * selectTaskList
@@ -31,19 +35,18 @@ public class TresdinTaskManagerController {
      * @return List
      */
     @GetMapping("/list")
-    public List<TaskItemVo> selectTaskList() {
+    public List<ScheduleTask> selectTaskList() {
         return tresdinScheduleService.getTaskItemList();
     }
 
     /**
-     * isStop
+     * selectTaskLogList
      *
-     * @param taskId taskId
-     * @return boolean
+     * @return List
      */
-    @GetMapping("/{taskId}/actions/check_stop")
-    public boolean isStop(@PathVariable String taskId) {
-        return tresdinScheduleService.isStop(taskId);
+    @GetMapping("/{taskId}/log/list")
+    public List<ScheduleTaskLog> selectTaskLogList(@PathVariable String taskId) {
+        return scheduleTaskStorage.selectTaskLogList(taskId);
     }
 
     /**
@@ -80,13 +83,13 @@ public class TresdinTaskManagerController {
     }
 
     /**
-     * handler
+     * execute
      *
      * @param taskId taskId
      */
-    @PostMapping("/{taskId}/actions/handler")
-    public void handler(@PathVariable String taskId) {
-        tresdinScheduleService.handler(taskId);
+    @PostMapping("/{taskId}/actions/execute")
+    public void execute(@PathVariable String taskId) {
+        tresdinScheduleService.execute(taskId);
     }
 
 }

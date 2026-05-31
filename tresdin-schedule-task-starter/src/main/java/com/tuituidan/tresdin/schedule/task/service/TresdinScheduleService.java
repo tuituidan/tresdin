@@ -1,33 +1,40 @@
 package com.tuituidan.tresdin.schedule.task.service;
 
 import com.tuituidan.tresdin.schedule.task.annotation.TaskName;
-import com.tuituidan.tresdin.schedule.task.bean.TaskItem;
-import com.tuituidan.tresdin.schedule.task.bean.TaskItemVo;
+import com.tuituidan.tresdin.schedule.task.bean.ScheduleTask;
+import com.tuituidan.tresdin.schedule.task.bean.ScheduleTaskLog;
 import com.tuituidan.tresdin.schedule.task.consts.JobStatus;
-import com.tuituidan.tresdin.schedule.task.util.CronAnalyzeKits;
-import com.tuituidan.tresdin.util.BeanExtUtils;
-import java.text.Collator;
+import com.tuituidan.tresdin.schedule.task.util.ScheduleLogUtils;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.CronTask;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.ScheduledMethodRunnable;
-import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
 /**
  * TresdinScheduleService.
@@ -36,14 +43,15 @@ import org.springframework.stereotype.Service;
  * @version 1.0
  * @date 2024/9/15
  */
+@Aspect
 @Service
 @Slf4j
-public class TresdinScheduleService implements SchedulingConfigurer {
+public class TresdinScheduleService implements SchedulingConfigurer, ApplicationRunner {
+
+    @Resource
+    private IScheduleTaskStorage scheduleTaskStorage;
 
     private final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-
-    @Value("${tresdin.schedule.task.auto:true}")
-    private Boolean taskAuto;
 
     @Value("${tresdin.schedule.task.pool-size:1}")
     private Integer poolSize;
@@ -60,33 +68,30 @@ public class TresdinScheduleService implements SchedulingConfigurer {
     /**
      * 任务列表.
      */
-    private List<TaskItem> taskItemList;
+    private List<ScheduleTask> taskItemList;
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         List<CronTask> cronTaskList = taskRegistrar.getCronTaskList();
         taskItemList = new ArrayList<>(cronTaskList.size());
-        cronTaskList.forEach(cronTask -> {
-            ScheduledMethodRunnable methodRunnable = (ScheduledMethodRunnable) cronTask.getRunnable();
-            String taskName = Optional.ofNullable(
-                            AnnotationUtils.findAnnotation(methodRunnable.getMethod(), TaskName.class))
-                    .map(TaskName::value).orElse(StringUtils.EMPTY);
-            TaskItem taskItem = new TaskItem()
-                    .setId(DigestUtils.md5Hex(taskName))
-                    .setName(taskName)
-                    .setDesc(CronAnalyzeKits.analyzeCron(cronTask.getExpression()))
-                    .setCron(cronTask.getExpression())
-                    .setStatus(JobStatus.STOP)
-                    .setCronTask(cronTask);
-            if (BooleanUtils.isTrue(taskAuto)) {
-                taskItem.setScheduledFuture(scheduler.schedule(cronTask.getRunnable(), cronTask.getTrigger()))
-                        .setNextRunTime(cronTask.getTrigger().nextExecutionTime(new SimpleTriggerContext()))
-                        .setStatus(JobStatus.WAITING_NEXT);
-            }
+        for (CronTask cronTask : cronTaskList) {
+            Method method = ((ScheduledMethodRunnable) cronTask.getRunnable()).getMethod();
+            Class<?> declaringClass = method.getDeclaringClass();
+            String taskFullPath = declaringClass.getName() + "." + method.getName();
+            String taskId = DigestUtils.md5DigestAsHex(taskFullPath.getBytes(StandardCharsets.UTF_8));
+            String taskPath = declaringClass.getSimpleName() + "." + method.getName();
+            String taskName = Optional.ofNullable(AnnotationUtils.findAnnotation(method, TaskName.class))
+                    .map(TaskName::value).orElse(taskPath);
+            ScheduleTask taskItem = new ScheduleTask()
+                    .setId(taskId)
+                    .setTaskName(taskName)
+                    .setTaskFullPath(taskFullPath)
+                    .setTaskPath(taskPath)
+                    .setCronTask(cronTask)
+                    .setStatus(JobStatus.STOP);
             taskItemList.add(taskItem);
-        });
-        final Collator collator = Collator.getInstance(Locale.CHINA);
-        taskItemList.sort(Comparator.comparing(o -> collator.getCollationKey(o.getName())));
+        }
+        taskItemList.sort(Comparator.comparing(ScheduleTask::getTaskPath));
         taskRegistrar.setCronTasksList(Collections.emptyList());
     }
 
@@ -95,22 +100,8 @@ public class TresdinScheduleService implements SchedulingConfigurer {
      *
      * @return List
      */
-    public List<TaskItemVo> getTaskItemList() {
-        List<TaskItemVo> resultList = new ArrayList<>();
-        for (TaskItem task : taskItemList) {
-            if (JobStatus.STOP.equals(task.getStatus())) {
-                task.setNextRunTime(null);
-            } else {
-                task.setStatus(task.getScheduledFuture().getDelay(TimeUnit.SECONDS) > 0
-                        ? JobStatus.WAITING_NEXT : JobStatus.RUNNING);
-                task.setNextRunTime(task.getCronTask().getTrigger().nextExecutionTime(new SimpleTriggerContext()));
-            }
-            TaskItemVo item = BeanExtUtils.convert(task, TaskItemVo::new);
-            item.setStatus(task.getStatus().getCode());
-            item.setStatusDesc(task.getStatus().getName());
-            resultList.add(item);
-        }
-        return resultList;
+    public List<ScheduleTask> getTaskItemList() {
+        return taskItemList;
     }
 
     /**
@@ -120,17 +111,14 @@ public class TresdinScheduleService implements SchedulingConfigurer {
      * @return boolean
      */
     public boolean start(String taskId) {
-        TaskItem taskItem = taskItemList.stream()
-                .filter(item -> item.getId().equals(taskId))
-                .findFirst().orElse(null);
+        ScheduleTask taskItem = getTaskItem(taskId);
         if (isScheduleCancelled(taskItem)) {
             taskItem.setScheduledFuture(scheduler.schedule(
-                    taskItem.getCronTask().getRunnable(),
-                    taskItem.getCronTask().getTrigger()));
-            log.info("任务：{} ,已启动", taskItem.getName());
-            taskItem.setStatus(JobStatus.WAITING_NEXT);
-            taskItem.setNextRunTime(taskItem.getCronTask().getTrigger()
-                    .nextExecutionTime(new SimpleTriggerContext()));
+                            taskItem.getCronTask().getRunnable(),
+                            taskItem.getCronTask().getTrigger()))
+                    .setStatus(JobStatus.WAITING_NEXT);
+            log.info("任务：{} ,已启动", taskItem.getTaskName());
+            scheduleTaskStorage.saveTask(taskItem.getTaskFullPath(), JobStatus.WAITING_NEXT);
             return true;
         }
         return false;
@@ -142,9 +130,8 @@ public class TresdinScheduleService implements SchedulingConfigurer {
      * @param taskItem TaskItem
      * @return boolean
      */
-    private boolean isScheduleCancelled(TaskItem taskItem) {
-        return taskItem != null
-                && taskItem.getCronTask() != null
+    private boolean isScheduleCancelled(ScheduleTask taskItem) {
+        return taskItem.getCronTask() != null
                 && (taskItem.getScheduledFuture() == null
                 || (taskItem.getScheduledFuture() != null && taskItem.getScheduledFuture().isCancelled()));
     }
@@ -156,16 +143,13 @@ public class TresdinScheduleService implements SchedulingConfigurer {
      * @return boolean
      */
     public boolean stop(String taskId) {
-        TaskItem taskItem = taskItemList.stream()
-                .filter(item -> item.getId().equals(taskId))
-                .findFirst().orElse(null);
-
-        if (taskItem != null
-                && taskItem.getScheduledFuture() != null
+        ScheduleTask taskItem = getTaskItem(taskId);
+        if (taskItem.getScheduledFuture() != null
                 && !taskItem.getScheduledFuture().isCancelled()) {
             taskItem.getScheduledFuture().cancel(false);
-            log.info("任务：{} ,已关闭", taskItem.getName());
-            taskItem.setStatus(JobStatus.STOP);
+            taskItem.setScheduledFuture(null).setStatus(JobStatus.STOP);
+            log.info("任务：{} ,已关闭", taskItem.getTaskName());
+            scheduleTaskStorage.saveTask(taskItem.getTaskFullPath(), JobStatus.STOP);
             return true;
         }
         return false;
@@ -182,30 +166,68 @@ public class TresdinScheduleService implements SchedulingConfigurer {
     }
 
     /**
-     * 判断是否没在运行.
-     *
-     * @param taskId 任务ID
-     * @return 是否运行中
-     */
-    public boolean isStop(String taskId) {
-        TaskItem taskItem = taskItemList.stream()
-                .filter(item -> item.getId().equals(taskId))
-                .findFirst().orElse(null);
-        return !(taskItem != null
-                && !JobStatus.STOP.equals(taskItem.getStatus())
-                && taskItem.getScheduledFuture() != null
-                && taskItem.getScheduledFuture().getDelay(TimeUnit.SECONDS) < 0);
-    }
-
-    /**
-     * handler
+     * execute
      *
      * @param taskId taskId
      */
-    public void handler(String taskId) {
-        taskItemList.stream()
-                .filter(item -> item.getId().equals(taskId))
-                .findFirst().ifPresent(taskItem -> taskItem.getCronTask().getRunnable().run());
+    public void execute(String taskId) {
+        getTaskItem(taskId).getCronTask().getRunnable().run();
+    }
+
+    /**
+     * taskAround.
+     *
+     * @param joinPoint joinPoint
+     * @throws Throwable ex
+     */
+    @Around("@annotation(org.springframework.scheduling.annotation.Scheduled)")
+    public Object taskAround(ProceedingJoinPoint joinPoint) throws Throwable {
+        Class<?> targetClass = joinPoint.getTarget().getClass();
+        Signature signature = joinPoint.getSignature();
+        String taskId = DigestUtils.md5DigestAsHex((targetClass.getName()
+                + "." + signature.getName()).getBytes(StandardCharsets.UTF_8));
+        ScheduleTaskLog taskLog = new ScheduleTaskLog()
+                .setTaskId(taskId)
+                .setTaskPath(targetClass.getSimpleName() + "." + signature.getName())
+                .setStartTimeStamp(System.currentTimeMillis());
+        ScheduleLogUtils.startLog(taskLog);
+        scheduleTaskStorage.insertTaskLog(taskLog);
+        try {
+            return joinPoint.proceed();
+        } catch (Exception ex) {
+            log.error("定时任务: {} 执行异常", taskLog.getTaskPath(), ex);
+            taskLog.setSuccess(false).setMsg(StringUtils.truncate(ex.getMessage(), 500));
+            return null;
+        } finally {
+            if (taskLog.getSuccess() == null) {
+                taskLog.setSuccess(true).setMsg("任务执行成功");
+            }
+            taskLog.setEndTimeStamp(System.currentTimeMillis());
+            ScheduleLogUtils.endLog();
+            scheduleTaskStorage.updateTaskLog(taskLog);
+        }
+    }
+
+    private ScheduleTask getTaskItem(String taskId) {
+        return taskItemList.stream().filter(it -> StringUtils.equals(taskId, it.getId()))
+                .findFirst().orElseThrow(() -> new NullPointerException("任务不存在"));
+    }
+
+    @Override
+    public void run(ApplicationArguments args) {
+        Map<String, JobStatus> existTaskMap = scheduleTaskStorage.selectTaskList().stream()
+                .collect(Collectors.toMap(ScheduleTask::getTaskFullPath, ScheduleTask::getStatus));
+        Set<String> existTaskKeys = existTaskMap.keySet();
+        for (ScheduleTask task : taskItemList) {
+            JobStatus jobStatus = existTaskMap.getOrDefault(task.getTaskFullPath(), task.getStatus());
+            if (!JobStatus.STOP.equals(jobStatus)) {
+                start(task.getId());
+            }
+            existTaskKeys.remove(task.getTaskFullPath());
+        }
+        if (CollectionUtils.isNotEmpty(existTaskKeys)) {
+            scheduleTaskStorage.deleteTask(existTaskKeys);
+        }
     }
 
 }

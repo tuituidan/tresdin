@@ -1,6 +1,5 @@
 package com.tuituidan.tresdin.schedule.task.util;
 
-import com.tuituidan.tresdin.util.StringExtUtils;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -118,7 +117,7 @@ public class CronAnalyzeKits {
     private static void mei(String s, StringBuilder result, String unit) {
         String[] arr = s.split(MEI);
         if (arr.length != MEI_SIZE) {
-            throw new IllegalArgumentException(StringExtUtils.format("表达式{}错误", s));
+            throw new IllegalArgumentException("表达式" + s + "错误");
         }
 
         if (arr[0].equals(arr[1]) || ZERO.equals(arr[0])) {
@@ -139,7 +138,7 @@ public class CronAnalyzeKits {
     private static void dao(String s, StringBuilder result, String unit) {
         String[] arr = s.split(DAO);
         if (arr.length != MEI_SIZE) {
-            throw new IllegalArgumentException(StringExtUtils.format("表达式{}错误", s));
+            throw new IllegalArgumentException("表达式" + s + "错误");
         }
 
         result.append("从第").append(arr[0]).append(unit).append("到第")
