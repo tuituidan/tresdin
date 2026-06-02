@@ -1,7 +1,6 @@
 package com.tuituidan.tresdin.schedule.task.service;
 
 import com.tuituidan.tresdin.schedule.task.bean.ScheduleTask;
-import com.tuituidan.tresdin.schedule.task.bean.ScheduleTaskLog;
 import com.tuituidan.tresdin.schedule.task.consts.JobStatus;
 import java.util.List;
 import java.util.Set;
@@ -36,27 +35,5 @@ public interface IScheduleTaskStorage {
      * @param fullPaths fullPaths
      */
     void deleteTask(Set<String> fullPaths);
-
-    /**
-     * getScheduleTaskLogList.
-     *
-     * @param taskId taskId
-     * @return List
-     */
-    List<ScheduleTaskLog> selectTaskLogList(String taskId);
-
-    /**
-     * insertScheduleTaskLog.
-     *
-     * @param log log
-     */
-    void insertTaskLog(ScheduleTaskLog log);
-
-    /**
-     * updateScheduleTaskLog.
-     *
-     * @param log log
-     */
-    void updateTaskLog(ScheduleTaskLog log);
 
 }

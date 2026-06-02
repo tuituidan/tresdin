@@ -4,6 +4,7 @@ import com.tuituidan.tresdin.schedule.task.annotation.TaskName;
 import com.tuituidan.tresdin.schedule.task.bean.ScheduleTask;
 import com.tuituidan.tresdin.schedule.task.bean.ScheduleTaskLog;
 import com.tuituidan.tresdin.schedule.task.consts.JobStatus;
+import com.tuituidan.tresdin.schedule.task.consts.TaskEventEnum;
 import com.tuituidan.tresdin.schedule.task.util.ScheduleLogUtils;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -50,6 +51,12 @@ public class TresdinScheduleService implements SchedulingConfigurer, Application
 
     @Resource
     private IScheduleTaskStorage scheduleTaskStorage;
+
+    @Resource
+    private IScheduleTaskLogStorage scheduleTaskLogStorage;
+
+    @Resource
+    private IScheduleTaskEventHandler scheduleTaskEventHandler;
 
     private final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
 
@@ -191,12 +198,17 @@ public class TresdinScheduleService implements SchedulingConfigurer, Application
                 .setTaskPath(targetClass.getSimpleName() + "." + signature.getName())
                 .setStartTimeStamp(System.currentTimeMillis());
         ScheduleLogUtils.startLog(taskLog);
-        scheduleTaskStorage.insertTaskLog(taskLog);
+        scheduleTaskLogStorage.insertTaskLog(taskLog);
+        ScheduleTask task = getTaskItem(taskId);
+        eventHandler(TaskEventEnum.BEFORE, task, taskLog);
         try {
-            return joinPoint.proceed();
+            Object proceed = joinPoint.proceed();
+            eventHandler(TaskEventEnum.SUCCESS, task, taskLog);
+            return proceed;
         } catch (Exception ex) {
             log.error("定时任务: {} 执行异常", taskLog.getTaskPath(), ex);
             taskLog.setSuccess(false).setMsg(StringUtils.truncate(ex.getMessage(), 500));
+            eventHandler(TaskEventEnum.ERROR, task, taskLog);
             return null;
         } finally {
             if (taskLog.getSuccess() == null) {
@@ -204,7 +216,16 @@ public class TresdinScheduleService implements SchedulingConfigurer, Application
             }
             taskLog.setEndTimeStamp(System.currentTimeMillis());
             ScheduleLogUtils.endLog();
-            scheduleTaskStorage.updateTaskLog(taskLog);
+            scheduleTaskLogStorage.updateTaskLog(taskLog);
+            eventHandler(TaskEventEnum.FINALLY, task, taskLog);
+        }
+    }
+
+    private void eventHandler(TaskEventEnum event, ScheduleTask task, ScheduleTaskLog taskLog) {
+        try {
+            scheduleTaskEventHandler.eventHandler(event, task, taskLog);
+        } catch (Exception ex) {
+            log.error("任务回调事件处理异常", ex);
         }
     }
 

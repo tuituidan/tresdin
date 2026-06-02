@@ -2,7 +2,7 @@ package com.tuituidan.tresdin.schedule.task.controller;
 
 import com.tuituidan.tresdin.schedule.task.bean.ScheduleTask;
 import com.tuituidan.tresdin.schedule.task.bean.ScheduleTaskLog;
-import com.tuituidan.tresdin.schedule.task.service.IScheduleTaskStorage;
+import com.tuituidan.tresdin.schedule.task.service.IScheduleTaskLogStorage;
 import com.tuituidan.tresdin.schedule.task.service.TresdinScheduleService;
 import java.util.List;
 import javax.annotation.Resource;
@@ -27,7 +27,7 @@ public class TresdinTaskManagerController {
     private TresdinScheduleService tresdinScheduleService;
 
     @Resource
-    private IScheduleTaskStorage scheduleTaskStorage;
+    private IScheduleTaskLogStorage scheduleTaskLogStorage;
 
     /**
      * selectTaskList
@@ -46,7 +46,7 @@ public class TresdinTaskManagerController {
      */
     @GetMapping("/{taskId}/log/list")
     public List<ScheduleTaskLog> selectTaskLogList(@PathVariable String taskId) {
-        return scheduleTaskStorage.selectTaskLogList(taskId);
+        return scheduleTaskLogStorage.selectTaskLogList(taskId);
     }
 
     /**
