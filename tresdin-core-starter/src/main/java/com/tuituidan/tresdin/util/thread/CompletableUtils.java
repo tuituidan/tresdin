@@ -11,7 +11,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
@@ -130,14 +129,14 @@ public class CompletableUtils implements ApplicationContextAware {
         }
     }
 
+    private static final Object LOCK = new Object();
+
     private static ThreadPoolExecutor getThreadPoolExecutor(String poolName) {
         ThreadPoolExecutor executor = THREAD_POOL_EXECUTOR_MAP.get(poolName);
         if (executor != null) {
             return executor;
         }
-        ReentrantLock lock = new ReentrantLock();
-        lock.lock();
-        try {
+        synchronized (LOCK) {
             executor = THREAD_POOL_EXECUTOR_MAP.get(poolName);
             if (executor != null) {
                 return executor;
@@ -146,10 +145,8 @@ public class CompletableUtils implements ApplicationContextAware {
             Assert.notNull(config, "线程池配置不存在-" + poolName);
             executor = newThreadPoolExecutor(config);
             THREAD_POOL_EXECUTOR_MAP.put(poolName, executor);
-        } finally {
-            lock.unlock();
+            return executor;
         }
-        return executor;
     }
 
     private static ThreadPoolConfig getDefaultConfig(Map<String, ThreadPoolConfig> configMap) {
