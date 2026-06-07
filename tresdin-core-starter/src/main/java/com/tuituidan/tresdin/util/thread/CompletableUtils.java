@@ -11,6 +11,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
@@ -20,6 +21,7 @@ import org.slf4j.MDC;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 /**
  * CompletableUtils.
@@ -36,6 +38,8 @@ public class CompletableUtils implements ApplicationContextAware {
      * 任务执行线程池.
      */
     private static final Map<String, ThreadPoolExecutor> THREAD_POOL_EXECUTOR_MAP = new HashMap<>();
+
+    private static final Map<String, ThreadPoolConfig> THREAD_POOL_CONFIG_MAP = new HashMap<>();
 
     private static final String DEF_KEY = "default";
 
@@ -68,7 +72,7 @@ public class CompletableUtils implements ApplicationContextAware {
      * @return Void
      */
     public static CompletableFuture<Void> runAsync(Runnable task) {
-        return CompletableFuture.runAsync(wrapTraceId(task), THREAD_POOL_EXECUTOR_MAP.get(DEF_KEY));
+        return CompletableFuture.runAsync(wrapTraceId(task), getThreadPoolExecutor(DEF_KEY));
     }
 
     /**
@@ -79,7 +83,7 @@ public class CompletableUtils implements ApplicationContextAware {
      * @return CompletableFuture
      */
     public static <T> CompletableFuture<T> runAsync(Supplier<T> task) {
-        return CompletableFuture.supplyAsync(wrapTraceId(task), THREAD_POOL_EXECUTOR_MAP.get(DEF_KEY));
+        return CompletableFuture.supplyAsync(wrapTraceId(task), getThreadPoolExecutor(DEF_KEY));
     }
 
     /**
@@ -90,7 +94,7 @@ public class CompletableUtils implements ApplicationContextAware {
      * @return Void
      */
     public static CompletableFuture<Void> runAsync(Runnable task, String poolName) {
-        return CompletableFuture.runAsync(wrapTraceId(task), THREAD_POOL_EXECUTOR_MAP.get(poolName));
+        return CompletableFuture.runAsync(wrapTraceId(task), getThreadPoolExecutor(poolName));
     }
 
     /**
@@ -102,7 +106,7 @@ public class CompletableUtils implements ApplicationContextAware {
      * @return CompletableFuture
      */
     public static <T> CompletableFuture<T> runAsync(Supplier<T> task, String poolName) {
-        return CompletableFuture.supplyAsync(wrapTraceId(task), THREAD_POOL_EXECUTOR_MAP.get(poolName));
+        return CompletableFuture.supplyAsync(wrapTraceId(task), getThreadPoolExecutor(poolName));
     }
 
     /**
@@ -122,8 +126,30 @@ public class CompletableUtils implements ApplicationContextAware {
         for (Entry<String, ThreadPoolConfig> entry : configMap.entrySet()) {
             ThreadPoolConfig targetConfig = BeanExtUtils.convert(defaultConfig, ThreadPoolConfig::new);
             BeanExtUtils.copyNotNullProperties(entry.getValue(), targetConfig);
-            THREAD_POOL_EXECUTOR_MAP.put(entry.getKey(), newThreadPoolExecutor(targetConfig));
+            THREAD_POOL_CONFIG_MAP.put(entry.getKey(), targetConfig);
         }
+    }
+
+    private static ThreadPoolExecutor getThreadPoolExecutor(String poolName) {
+        ThreadPoolExecutor executor = THREAD_POOL_EXECUTOR_MAP.get(poolName);
+        if (executor != null) {
+            return executor;
+        }
+        ReentrantLock lock = new ReentrantLock();
+        lock.lock();
+        try {
+            executor = THREAD_POOL_EXECUTOR_MAP.get(poolName);
+            if (executor != null) {
+                return executor;
+            }
+            ThreadPoolConfig config = THREAD_POOL_CONFIG_MAP.get(poolName);
+            Assert.notNull(config, "线程池配置不存在-" + poolName);
+            executor = newThreadPoolExecutor(config);
+            THREAD_POOL_EXECUTOR_MAP.put(poolName, executor);
+        } finally {
+            lock.unlock();
+        }
+        return executor;
     }
 
     private static ThreadPoolConfig getDefaultConfig(Map<String, ThreadPoolConfig> configMap) {
@@ -157,7 +183,7 @@ public class CompletableUtils implements ApplicationContextAware {
     }
 
     private static ThreadPoolExecutor newThreadPoolExecutor(ThreadPoolConfig config) {
-        log.info(StringExtUtils.format("初始化线程池:{},核心线程数:{},最大线程数:{},线程存活时间:{}分钟,队列大小：{}" ,
+        log.info(StringExtUtils.format("初始化线程池:{},核心线程数:{},最大线程数:{},线程存活时间:{}分钟,队列大小：{}",
                 config.getThreadNamePrefix(),
                 config.getCorePoolNum(),
                 config.getMaxPoolNum(),
@@ -176,7 +202,7 @@ public class CompletableUtils implements ApplicationContextAware {
             try {
                 executor.getQueue().put(r);
             } catch (InterruptedException ex) {
-                log.error("线程加入队列失败" , ex);
+                log.error("线程加入队列失败", ex);
                 Thread.currentThread().interrupt();
             }
         }
