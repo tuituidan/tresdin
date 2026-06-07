@@ -25,4 +25,9 @@ public class TresdinConsts {
     public static final String ROOT_DIR = "/".equals(System.getProperty("user.dir")) ? ""
             : System.getProperty("user.dir");
 
+    /**
+     * traceId
+     */
+    public static final String TRACE_ID = "traceId";
+
 }

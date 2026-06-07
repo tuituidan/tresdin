@@ -1,64 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <configuration debug="false">
-    <springProperty scope="context" name="rootLevel" source="logback.level.root" defaultValue="INFO" />
-    <springProperty scope="context" name="sqlLevel" source="logback.level.sql" defaultValue="INFO" />
-    <springProperty scope="context" name="PORT" source="server.port" defaultValue="8080" />
-    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="application" />
-    <define name="IP" class="com.tuituidan.tresdin.config.LogbackIpGetProperty" />
-    <property name="LOG_HOME" value="logs" />
-
+    <property name="log_home" value="logs" />
+    <property name="log_pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] [%-5level] [%-5thread] [%logger{20}.%method:%line] - %msg%n" />
+    <!-- logback内部状态日志，配置可能有错误时再开启 -->
     <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
-
     <!-- 控制台输出 -->
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <Target>System.out</Target>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] [%-5thread] %logger{20} - %msg%n</pattern>
+            <pattern>${log_pattern}</pattern>
         </encoder>
     </appender>
 
     <!-- 正常日志输出文件 -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${LOG_HOME}/${APP_NAME}_stdout_${IP}_${PORT}.log</File>
+        <File>${log_home}/stdout.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${LOG_HOME}/${APP_NAME}_stdout.%d{yyyy-MM-dd}_${IP}_${PORT}.log
+            <FileNamePattern>${log_home}/stdout.%d{yyyy-MM-dd}.log
             </FileNamePattern>
             <maxHistory>20</maxHistory>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] [%-5thread] %logger{20} - %msg%n</pattern>
+            <pattern>${log_pattern}</pattern>
         </encoder>
     </appender>
 
     <!-- 错误日志输出文件 -->
     <appender name="FILE-ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${LOG_HOME}/${APP_NAME}_stderr_${IP}_${PORT}.log</File>
+        <File>${log_home}/stderr.log</File>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>error</level>
         </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${LOG_HOME}/${APP_NAME}_stderr.%d{yyyy-MM-dd}_${IP}_${PORT}.log
+            <FileNamePattern>${log_home}/stderr.%d{yyyy-MM-dd}.log
             </FileNamePattern>
             <maxHistory>20</maxHistory>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] [%-5thread] %logger{20} - %msg%n</pattern>
+            <pattern>${log_pattern}</pattern>
         </encoder>
     </appender>
 
     <!-- 默认jdbc日志输出文件 -->
     <appender name="FILE-JDBC" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${LOG_HOME}/${APP_NAME}_jdbc_${IP}_${PORT}.log</File>
+        <File>${log_home}/jdbc.log</File>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>debug</level>
         </filter>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] [%-5thread] %logger{20} - %msg%n</pattern>
+            <pattern>${log_pattern}</pattern>
         </encoder>
         <append>true</append>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_HOME}/${APP_NAME}_jdbc.%d{yyyy-MM-dd}_${IP}_${PORT}.log
+            <fileNamePattern>${log_home}/jdbc.%d{yyyy-MM-dd}.log
             </fileNamePattern>
             <maxHistory>7</maxHistory>
         </rollingPolicy>
@@ -70,18 +65,19 @@
     <logger name="jdbc.audit" level="off" />
     <logger name="jdbc.resultset" level="off" />
     <logger name="jdbc.resultsettable" level="off" />
+    <logger name="com.ulisesbocchio.jasyptspringboot" level="off"/>
 
-    <logger name="jdbc.sqltiming" level="${sqlLevel}" additivity="false">
-<!--        <appender-ref ref="stdout" />-->
+    <logger name="jdbc.sqltiming" level="info" additivity="false">
+        <appender-ref ref="stdout" />
         <appender-ref ref="FILE-JDBC" />
     </logger>
-    <logger name="com.tuituidan" level="${rootLevel}" additivity="false">
+    <logger name="com.tuituidan" level="info" additivity="false">
         <appender-ref ref="stdout" />
         <appender-ref ref="FILE" />
         <appender-ref ref="FILE-ERROR" />
     </logger>
-    <root level="warn">
-<!--        <appender-ref ref="stdout" />-->
+    <root level="INFO">
+        <appender-ref ref="stdout" />
         <appender-ref ref="FILE" />
         <appender-ref ref="FILE-ERROR" />
     </root>

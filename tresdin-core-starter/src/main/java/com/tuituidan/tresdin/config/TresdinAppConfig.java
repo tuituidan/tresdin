@@ -1,6 +1,7 @@
 package com.tuituidan.tresdin.config;
 
 import java.time.Duration;
+import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -8,6 +9,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * AppConfig.
@@ -17,7 +20,7 @@ import org.springframework.web.client.RestTemplate;
  * @date 2021/9/14
  */
 @Configuration
-public class TresdinAppConfig implements ApplicationListener<ApplicationReadyEvent> {
+public class TresdinAppConfig implements WebMvcConfigurer, ApplicationListener<ApplicationReadyEvent> {
 
     /**
      * 连接超时时间.
@@ -29,6 +32,9 @@ public class TresdinAppConfig implements ApplicationListener<ApplicationReadyEve
      */
     private static final int READ_TIMEOUT = 120;
 
+    @Resource
+    private LogTraceInterceptor logTraceInterceptor;
+
     /**
      * 初始RestTemplate 设置超时时间.
      *
@@ -39,7 +45,13 @@ public class TresdinAppConfig implements ApplicationListener<ApplicationReadyEve
         return new RestTemplateBuilder()
                 .setConnectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT))
                 .setReadTimeout(Duration.ofSeconds(READ_TIMEOUT))
+                .additionalInterceptors(new RestTemplateTraceIdInterceptor())
                 .build();
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(logTraceInterceptor).addPathPatterns("/**");
     }
 
     @Override
