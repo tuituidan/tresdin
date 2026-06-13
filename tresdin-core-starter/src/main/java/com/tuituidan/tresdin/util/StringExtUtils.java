@@ -110,4 +110,23 @@ public class StringExtUtils {
                 Separator.UNDERLINE).toLowerCase();
     }
 
+    /**
+     * 下划线转驼峰命名
+     */
+    public static String underLineToCamelCase(String str) {
+        if (StringUtils.isBlank(str) || !str.contains(Separator.UNDERLINE)) {
+            return str;
+        }
+        String[] split = str.split(Separator.UNDERLINE);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < split.length; i++) {
+            if (i == 0) {
+                sb.append(split[i]);
+            } else {
+                sb.append(StringUtils.capitalize(split[i]));
+            }
+        }
+        return sb.toString();
+    }
+
 }
