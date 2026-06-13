@@ -4,9 +4,9 @@ import com.tuituidan.tresdin.schedule.task.bean.ScheduleTaskLog;
 import com.tuituidan.tresdin.schedule.task.service.IScheduleTaskLogStorage;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
@@ -19,7 +19,7 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
  */
 public class ScheduleTaskLogDefaultStorageImpl implements IScheduleTaskLogStorage {
 
-    private final Map<String, CircularFifoQueue<ScheduleTaskLog>> taskLogMap = new HashMap<>();
+    private final Map<String, CircularFifoQueue<ScheduleTaskLog>> taskLogMap = new ConcurrentHashMap<>();
 
     @Override
     public List<ScheduleTaskLog> selectTaskLogList(String taskId) {

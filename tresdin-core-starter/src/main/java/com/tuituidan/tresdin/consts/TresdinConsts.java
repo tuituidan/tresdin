@@ -22,8 +22,12 @@ public class TresdinConsts {
      * 与jar同级目录，jar如果放在系统根目录，比如docker环境
      * System.getProperty("user.dir")获取到的是"/"，直接去掉.
      */
-    public static final String ROOT_DIR = "/".equals(System.getProperty("user.dir")) ? ""
-            : System.getProperty("user.dir");
+    public static final String ROOT_DIR = computeRootDir();
+
+    private static String computeRootDir() {
+        String userDir = System.getProperty("user.dir");
+        return "/".equals(userDir) ? "" : userDir;
+    }
 
     /**
      * traceId

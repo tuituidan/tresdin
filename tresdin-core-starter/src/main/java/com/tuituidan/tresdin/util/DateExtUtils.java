@@ -57,7 +57,7 @@ public class DateExtUtils {
         Assert.hasText(source, "请传入要转换日期的字符串");
         String time = source.trim().replaceAll("\\D", "-");
         String[] split = Arrays.stream(time.split("-"))
-                .filter(StringUtils::isNoneBlank).toArray(String[]::new);
+                .filter(StringUtils::isNotBlank).toArray(String[]::new);
         Assert.isTrue(split.length > 2, "日期格式错误：" + source);
         return LocalDate.of(Integer.parseInt(split[0]),
                 Integer.parseInt(split[1]),
@@ -74,7 +74,7 @@ public class DateExtUtils {
         Assert.hasText(source, "请传入要转换时间的字符串");
         String time = source.trim().replaceAll("\\D", "-");
         String[] split = Arrays.stream(time.split("-"))
-                .filter(StringUtils::isNoneBlank).toArray(String[]::new);
+                .filter(StringUtils::isNotBlank).toArray(String[]::new);
         Assert.isTrue(split.length > 5, "时间格式错误：" + source);
         return LocalDateTime.of(Integer.parseInt(split[0]),
                 Integer.parseInt(split[1]),

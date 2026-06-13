@@ -44,6 +44,6 @@ public enum JobStatus {
                 return value;
             }
         }
-        return null;
+        throw new IllegalArgumentException("未知的任务状态：" + code);
     }
 }
