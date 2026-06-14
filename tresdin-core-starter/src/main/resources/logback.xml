@@ -59,15 +59,9 @@
         </rollingPolicy>
     </appender>
 
-    <!-- jdbc相关无用输出 -->
-    <logger name="jdbc.sqlonly" level="off" />
-    <logger name="jdbc.connection" level="off" />
-    <logger name="jdbc.audit" level="off" />
-    <logger name="jdbc.resultset" level="off" />
-    <logger name="jdbc.resultsettable" level="off" />
     <logger name="com.ulisesbocchio.jasyptspringboot" level="off"/>
 
-    <logger name="jdbc.sqltiming" level="info" additivity="false">
+    <logger name="p6spy" level="info" additivity="false">
         <appender-ref ref="stdout" />
         <appender-ref ref="FILE-JDBC" />
     </logger>
